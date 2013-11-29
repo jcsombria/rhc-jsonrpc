@@ -1,5 +1,5 @@
 /**
- * JSON-RPC Server & Client Tester
+ * JSON-RPC Server Tester
  * author: Jesús Chacón <jcsombria@gmail.com>
  *
  * Copyright (C) 2013 Jesús Chacón
@@ -18,8 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var server = require('./JsonRpcServer');
+var server = require('./RhcServer');
+var myboard = new require("./board").BeagleBone();
 var http = require('http');
+
+server.setBoard(myboard);
 
 //process.env.PORT = 2055;
 //process.env.IP = 2055;

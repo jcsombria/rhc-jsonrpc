@@ -21,8 +21,11 @@
 var board = require('./board');
 var myboard = new board.BeagleBone();
 
-// Method Handler
-var jsonrpcServer = {
+// JsonRpcServer Class
+function JsonRpcServer() {
+}
+
+var JsonRpcServer = {
 	errors: [
 		{code: -32700, message: 'Parse error'},
 		{code: -32600, message: 'Invalid request'},
@@ -59,15 +62,14 @@ var jsonrpcServer = {
 		if(method) {
 			var len = (request.params instanceof Array) ? request.params.length : 1;
 			var nparams = request.params ? len : 0;
-			if(nparams != method.nparams && !(len))
+			if(nparams != method.nparams && !len)
 				return this.responseWithError(request.id, -32602, 'Invalid params');
-				
-			result = method.handler(request.params);
+            result = method.handler(request.params);
             if(request.id !== undefined)
                 return this.response(result, request.id);
             else
                 return this.response(result);
-		} else {			
+       	} else {
 			return this.responseWithError(request.id, -32601, 'Method not found');
 		}
 		return result;
@@ -100,73 +102,10 @@ var jsonrpcServer = {
 	 */
 	response: function(result, id) {
 		var response = {jsonrpc: '2.0',	result: result};
-		
+
 		if(id!==undefined) response.id = id;
 		return response;
 	}
-};
+}
 
-// HIL Server protocol implementation
-/**
- * Method connect
- */
-jsonrpcServer.on('connect', 0, function(params) {
-	return 'Ok';
-});
-
-/**
- * Method getMetadata
- */
-jsonrpcServer.on('open', 0, function(params) {
-	return {
-		methods: ['connect', 'open', 'run', 'getValue', 'setValue', 'stop', 'disconnect'],
-		vars: myboard.vars
-	};
-});
-
-/**
- * Method run
- */
-jsonrpcServer.on('run', 0, function(params) {
-	return 'Ok';
-});
-
-/**
- * Method setValue
- */
-jsonrpcServer.on('setValue', 2, function(params) {
-	var name = params[0];
-	var value = params[1];
-
-	var variable = myboard.vars[name];
-	if(variable && variable.type != board.ioDir.IN) {
-		variable.value = value;
-		return true;
-	}
-	return false;
-});
-
-/**
- * Method getValue
- */
-jsonrpcServer.on('getValue', 1, function(params) {
-	var name = params[0];
-	var variable = myboard.vars[name];
-	if(variable && variable.type != board.ioDir.OUT) {
-		return variable.value;
-	}
-});
-
-/**
- * Method stop
- */
-jsonrpcServer.on('stop', 0, function(params) {
-	return 'Ok';
-});
-
-// Method disconnect
-jsonrpcServer.on('disconnect', 0, function(params) {
-	return 'Ok';
-});
-
-module.exports = jsonrpcServer;
+module.exports = JsonRpcServer;

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var jsonrpcBuilder = {
+var JsonRpcBuilder = {
 	/** ID for rpc calls */
 //	id: 0,
 	/** List of method calls to process in batch mode*/
@@ -44,7 +44,7 @@ var jsonrpcBuilder = {
 	 *
 	 * @param {string} method - The method to call
 	 * @param {array|object} params - The params either by position (array) or 
-   * 																	 by name (object).
+     *                                by name (object).
 	 * @param {string|integer} id - The id of the call
 	 */
 	request: function(method, params, id) {
@@ -120,4 +120,4 @@ var jsonrpcBuilder = {
 	}
 }
 
-module.exports = jsonrpcBuilder;
+module.exports = JsonRpcBuilder;
