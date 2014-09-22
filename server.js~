@@ -18,17 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var server = require('./RhcServer');
-var myboard = new require("./board").BeagleBone();
 var http = require('http');
+var rpcserver = require('./HILRemoteServer');
+//rpcserver.setBoard(myboard);
 
-server.setBoard(myboard);
-
-//process.env.PORT = 2055;
-//process.env.IP = 2055;
+process.env.PORT = 2055;
+process.env.IP = 'localhost';
 
 // Create the http server
-http.createServer(onRequest).listen(process.env.PORT, process.env.IP, function() {
+http.createServer(onRequest).listen(process.env.PORT, function() {
 	console.log('Server listening on ' + process.env.IP + ':'+ process.env.PORT);
 });
 
@@ -48,11 +46,8 @@ function onRequest(request, response) {
 
   request.on('end', function () {
 		response.writeHead(200, headers);
-		response.write(JSON.stringify(server.parse(body)));
+console.log(body);
+//		response.write(JSON.stringify(rpcserver.parse(body)));
 		response.end();
 	});
 }
-
-
-
-

@@ -20,23 +20,6 @@
 
 function JsonRpcServer() {}
 
-JsonRpcServer.prototype.parse = function(jsonrpc) {
-	var methodCall = JSON.parse(jsonrpc);
-	var isBatchMode = (methodCall instanceof Array);
-	var result;
-	if(isBatchMode) {
-		result = [];
-		for(var currentRequest=0, currentResponse=0, len=methodCall.length; currentRequest<len; currentRequest++) {
-			result[currentResponse] = this.process(methodCall[currentRequest]);
-			var isEmpty = result[currentRequest]
-			if(!isEmpty) currentRequest++;
-		}	
-	} else {
-		result = this.process(methodCall);
-	}
-	return result;
-}
-
 JsonRpcServer.prototype.process = function(request) {
 	var method = this[request.method];
 	var result;
@@ -55,6 +38,23 @@ JsonRpcServer.prototype.process = function(request) {
 	}
 	return result;
 };
+
+// Handle a JSON-RPC call (one method/notification or a batch)
+JsonRpcServer.prototype.parse = function(jsonrpc) {
+	var methodCall = JSON.parse(jsonrpc);
+	var isBatchMode = (methodCall instanceof Array);
+	var result;
+	if(isBatchMode) {
+		result = [];
+		for(var i=0, j=0, len=methodCall.length; i<len; i++) {
+			result[j] = this.process(methodCall[i]);
+			if(result[j]) j++;
+		}	
+	} else {
+		result = this.process(methodCall);
+	}
+	return result;
+}
 
 JsonRpcServer.prototype.on = function(method, nparams, handler) {		
 	this[method] = {nparams: nparams, handler: handler};
