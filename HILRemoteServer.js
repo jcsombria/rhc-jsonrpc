@@ -24,7 +24,7 @@ var rpcserver = new JsonRpcServer();
 var myboard = new Board.BeagleBone();
 
 rpcserver.setBoard = function(board) {
-	console.log(board.vars):
+	console.log(board.vars);
 	this.board = board;
 };
 
