@@ -17,28 +17,49 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var Boards = require('./Boards');
 var Variable = require('./Variable');
 
-function BoardInterface() {
-	this.board = Boards.BeagleBoneBlack;
-
+function BoardInterface(board) {
 	this.vars = {};
-	this.pinToVar = {};
-	this.varToPin = {};
+	this.board = board;
 }
 
-BoardInterface.prototype.bindVariableToPin = function(variable, pin) {
+/*BoardInterface.prototype.bindVariableToPin = function(variable, pin) {
 	if(this.hasVariable(variable) && this.board.hasPin(pin)) {
 		this.pinToVar[pin] = variable;
 		this.varToPin[variable] = pin;
 		variable.setRange(this.board.pinRange(pin));
+		if(this.board.isInput(pin)) {
+			this.inputs[variable] = pin;
+		} else {
+			this.outputs[variable] = pin;
+		}
 	}
-}
+}*/
+
+BoardInterface.prototype.read = function(variable) {
+	if(this.hasVariable(variable)) {
+		var pin = this.vars[variable].getPin();
+		var value = this.board.read(pin);
+		return value;
+	}
+	return 0;
+};
+
+BoardInterface.prototype.write = function(variable, value) {
+	if(this.hasVariable(variable)) {
+		this.vars[variable].setValue(value);
+		this.board.write(this.vars[variable].getPin(), value);
+	}
+};
 
 BoardInterface.prototype.addVariable = function(name, pin) {
-	if(this.board.hasPin(pin)) {			
-		this.vars[name] = new Variable(name);
+	if(this.board.hasPin(pin)) {
+		var variable = new Variable(name);
+		variable.setPin(pin);
+		var range = this.board.pinRange;
+		variable.setRange(range['min'], range['max']);
+		this.vars[name] = variable;
 	}
 };
 
@@ -54,25 +75,62 @@ BoardInterface.prototype.hasVariable = function(variable) {
 	}
 };
 
-BoardInterface.prototype.setValue = function(variable, value) {
-	if(this.hasVariable(variable)) {
-		this.vars[variable].setValue(value);
+BoardInterface.prototype.addReadableVariable = function(name, pin) {
+	if(this.board.isOutput(pin)) {
+		this.addVariable(name, pin);
+	} else if(this.board.isInputOutput(pin)) {
+		this.addVariable(name, pin);
+		this.board.setInputMode(pin);
 	}
-};
+}
 
-BoardInterface.prototype.getValue = function(variable) {
+BoardInterface.prototype.setReadable = function(variable) {	
 	if(this.hasVariable(variable)) {
-		return this.vars[variable].getValue();
+		var pin =	this.vars[variable].getPin();
+		if(this.board.isInputOutput(pin)) {
+			this.board.setInputMode(pin);
+		};
 	}
-};
+}
 
-//	this.vars = {
-//		'led': { pin: "P9_14", value: 0},
-//		'input2': {type: ioDir.IN, range: {min:0, max:1.8}, value: 0},
-//		'input3': {type: ioDir.IN, range: {min:0, max:1.8}, value: 0},
-//		'input4': {type: ioDir.IN, range: {min:0, max:1.8}, value: 0},
-//		'output1': {type: ioDir.OUT, range: {min:0, max:3.3}, value: 0},
-//		'output2': {type: ioDir.OUT, range: {min:0, max:3.3}, value: 0}
-//	};
+BoardInterface.prototype.addWritableVariable = function(name, pin) {
+	if(this.board.isOutput(pin)) {
+		this.addVariable(name, pin);
+	} else if(this.board.isInputOutput(pin)) {
+		this.addVariable(name, pin);
+		this.board.setOutputMode(pin);
+	}
+}
+
+BoardInterface.prototype.setWritable = function(variable) {
+	if(this.hasVariable(variable)) {
+		var pin =	this.vars[variable].getPin();
+		if(this.board.isInputOutput(pin)) {
+			this.board.setOutputMode(pin);
+		};
+	}
+}
+
+BoardInterface.prototype.getReadableVariables = function() {
+	var listOfInputVariables = [];
+	for(variable in this.vars) {
+		var pin = this.vars[variable].getPin();
+		if(this.board.isInput(pin)) {
+			listOfInputVariables.push(variable);
+		}
+	}
+	return listOfInputVariables;
+}
+
+BoardInterface.prototype.getWritableVariables = function() {
+	var listOfOutputVariables = [];
+	for(variable in this.vars) {
+		var pin = this.vars[variable].getPin();
+		if(this.board.isOutput(pin)) {
+			listOfOutputVariables.push(variable);
+		}
+	}
+	return listOfOutputVariables;
+}
 
 module.exports = BoardInterface;

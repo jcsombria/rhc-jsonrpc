@@ -18,6 +18,7 @@
  */
 function Variable(name) {
 	this.name = name;
+	this.pin = undefined;
 	this.value = 0;	
 	this.minimum = -Infinity;
 	this.maximum = Infinity;
@@ -44,6 +45,18 @@ Variable.prototype.setRange = function(minimum, maximum) {
 
 Variable.prototype.getValue = function() {
 	return this.value;
+}
+
+Variable.prototype.getName = function() {
+	return this.name;
+}
+
+Variable.prototype.setPin = function(pin) {
+	this.pin = pin;
+}
+
+Variable.prototype.getPin = function() {
+	return this.pin;
 }
 
 module.exports = Variable;

@@ -19,60 +19,61 @@
  */
 
 var JsonRpcServer = require('./JsonRpcServer');
-var Board = require("./board");
-var rpcserver = new JsonRpcServer();
-var myboard = new Board.BeagleBone();
+var HardwareInterfaceFactory = require('./HardwareInterfaceFactory');
 
-rpcserver.setBoard = function(board) {
-	console.log(board.vars);
-	this.board = board;
-};
+var RHIPImpl = new JsonRpcServer();
 
-rpcserver.on('connect', 0, function(params) {
+RHIPImpl.hardwareInterface = HardwareInterfaceFactory.makeBeagleBoneBlackHardwareInterface();
+
+RHIPImpl.init = function() {
+	this.on('connect', 0, RHIPImpl.connect.bind(this));
+	this.on('open', 0, RHIPImpl.open.bind(this));
+	this.on('run', 0, RHIPImpl.run.bind(this));
+	this.on('getValue', 1, RHIPImpl.getValue.bind(this));
+	this.on('setValue', 2, RHIPImpl.setValue.bind(this));
+	this.on('sync', 0, RHIPImpl.sync.bind(this));
+	this.on('stop', 0, RHIPImpl.stop.bind(this));
+	this.on('disconnect', 0, RHIPImpl.disconnect.bind(this));
+}
+
+RHIPImpl.connect = function() {
 	return 'connect';
-});
-
-rpcserver.on('open', 0, function(params) {
-console.log(myboard);
+}
+	
+RHIPImpl.open = function() {
 	return {
 		methods: ['connect', 'open', 'run', 'getValue', 'setValue', 'sync', 'stop', 'disconnect'],
-		vars: myboard.vars
+		readable: this.hardwareInterface.getReadableVariables(),
+		writable: this.hardwareInterface.getWritableVariables() 
 	};
-});
+}
 
-rpcserver.on('run', 0, function(params) {
+RHIPImpl.run = function() {
 	return 'run';
-});
+}
 
-rpcserver.on('getValue', 1, function(params) {
-	var name = params[0];
-	var variable = myboard.vars[name];
-	if(variable && variable.type != Board.ioDir.OUT) {
-		return variable.value;
-	}
-});
+RHIPImpl.getValue = function(params) {
+	var variable = [params[0]];
+	return this.hardware.read(variable);
+}
 
-rpcserver.on('setValue', 2, function(params) {
-	var name = params[0];
-	var value = params[1];
+RHIPImpl.setValue = function(params) {
+	var variable = params[0];
+	var value = params[1];	
+	this.hardware.write(variable, value);
+}
 
-	var variable = myboard.vars[name];
-	if(variable && variable.type != Board.ioDir.IN) {
-		variable.value = value;
-	}
-	return 'Variable '+name+' updated with value '+value;
-});
-
-rpcserver.on('sync', 0, function(params) {
+RHIPImpl.sync = function() {
 	return 'sync';
-});
+}
 
-rpcserver.on('stop', 0, function(params) {
+RHIPImpl.stop = function() {
 	return 'stop';
-});
+}
 
-rpcserver.on('disconnect', 0, function(params) {
+RHIPImpl.disconnect = function() {
 	return 'disconnect';
-});
+}
 
-module.exports = rpcserver;
+RHIPImpl.init();
+module.exports = RHIPImpl;
