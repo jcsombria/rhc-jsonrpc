@@ -54,13 +54,13 @@ RHIPImpl.run = function() {
 
 RHIPImpl.getValue = function(params) {
 	var variable = [params[0]];
-	return this.hardware.read(variable);
+	return this.hardwareInterface.read(variable);
 }
 
 RHIPImpl.setValue = function(params) {
 	var variable = params[0];
 	var value = params[1];	
-	this.hardware.write(variable, value);
+	this.hardwareInterface.write(variable, value);
 }
 
 RHIPImpl.sync = function() {

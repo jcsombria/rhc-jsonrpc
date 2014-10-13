@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var HardwareInterface = require('./HardwareInterface');
 var BoardInterface = require('./BoardInterface');
 var Boards = require('./Boards');
 
 var HardwareInterfaceFactory = {
 	makeTestHardwareInterface: function() {
-		testHardwareInterface = new HardwareInterface(Boards.TestBoard);
+		testHardwareInterface = new BoardInterface(Boards.TestBoard);
 		var variables = {	
 			'input1': 'P1',
 			'input2': 'P2',
