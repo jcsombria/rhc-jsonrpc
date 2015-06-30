@@ -17,23 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var BoardInterface = require('./BoardInterface');
-var Boards = require('./Boards');
+var BoardInterface = require('../board/BoardInterface');
+var Board = require('../board/Board');
 
 var HardwareInterfaceFactory = {
 	makeTestHardwareInterface: function() {
-		testHardwareInterface = new BoardInterface(Boards.TestBoard);
-		var variables = {	
-			'input1': 'P1',
-			'input2': 'P2',
-			'output1': 'P3'
+		testHardwareInterface = new BoardInterface(Board.TestBoard);
+		var variables = {
+			'variable1': 'P1',
+			'variable2': 'P2',
 		};
-		testHardwareInterface.addVariables(variables);
+		for(variable in variables) {
+			var pin = variables[variable];
+			testHardwareInterface.addVariable(variable, pin);
+		}
 		return testHardwareInterface;
 	},
 
 	makeBeagleBoneBlackHardwareInterface: function() {
-		beagleBoneBlackInterface = new BoardInterface(Boards.BeagleBoneBlack);
+		beagleBoneBlackInterface = new BoardInterface(Board.BeagleBoneBlack);
 		var readable = {
 			'motor1_speed': 'P9_35',
 			'motor2_speed': 'P9_36',

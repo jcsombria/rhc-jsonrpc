@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var Variable = require('./Variable');
+var Variable = require('../app/Variable');
 
 function BoardInterface(board) {
 	this.vars = {};
@@ -111,6 +111,15 @@ BoardInterface.prototype.setWritable = function(variable) {
 	}
 }
 
+BoardInterface.prototype.setReadableWritable = function() {
+	if(this.hasVariable(variable)) {
+		var pin =	this.vars[variable].getPin();
+		if(this.board.isInputOutput(pin)) {
+			this.board.setOutputMode(pin);
+		};
+	}
+}
+
 BoardInterface.prototype.getReadableVariables = function() {
 	var listOfInputVariables = [];
 	for(variable in this.vars) {
@@ -127,6 +136,17 @@ BoardInterface.prototype.getWritableVariables = function() {
 	for(variable in this.vars) {
 		var pin = this.vars[variable].getPin();
 		if(this.board.isOutput(pin)) {
+			listOfOutputVariables.push(variable);
+		}
+	}
+	return listOfOutputVariables;
+}
+
+BoardInterface.prototype.getReadableAndWritableVariables = function() {
+	var listOfOutputVariables = [];
+	for(variable in this.vars) {
+		var pin = this.vars[variable].getPin();
+		if(this.board.isInputOutput(pin)) {
 			listOfOutputVariables.push(variable);
 		}
 	}

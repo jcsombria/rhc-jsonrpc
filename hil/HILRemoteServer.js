@@ -1,5 +1,5 @@
 /**
- * JSON-RPC Server & HIL Remote Protocol - Implementation for BeagleBone
+ * JSON-RPC Server & HIL Remote Protocol - BeagleBone Implementation
  * author: Jesús Chacón <jcsombria@gmail.com>
  *
  * Copyright (C) 2014 Jesús Chacón
@@ -18,9 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var JsonRpcServer = require('./JsonRpcServer');
-var HardwareInterfaceFactory = require('./HardwareInterfaceFactory');
-
+var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
+var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
 var RHIPImpl = new JsonRpcServer();
 
 RHIPImpl.hardwareInterface = HardwareInterfaceFactory.makeBeagleBoneBlackHardwareInterface();
@@ -42,14 +41,25 @@ RHIPImpl.connect = function() {
 	
 RHIPImpl.open = function() {
 	return {
-		methods: ['connect', 'open', 'run', 'getValue', 'setValue', 'sync', 'stop', 'disconnect'],
+		methods: ['connect', 'open', 'run', 'getValue', 'setValue', 'sync', 'stop', 'close', 'disconnect'],
 		readable: this.hardwareInterface.getReadableVariables(),
 		writable: this.hardwareInterface.getWritableVariables() 
 	};
 }
 
+RHIPImpl.close = function() {
+  return 'bye bye';
+}
+
 RHIPImpl.run = function() {
 	return 'run';
+}
+
+RHIPImpl.get = function(params) {
+	var variable = [params[0]];
+	var condition = [params[1]];
+	
+	return this.hardwareInterface.read(variable);
 }
 
 RHIPImpl.getValue = function(params) {

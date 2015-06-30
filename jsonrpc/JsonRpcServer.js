@@ -18,7 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function JsonRpcServer() {}
+function JsonRpcServer() {
+  this.methods = {};
+}
 
 JsonRpcServer.prototype.parse = function(jsonrpc) {
 	var methodCall = JSON.parse(jsonrpc);
@@ -38,7 +40,7 @@ JsonRpcServer.prototype.parse = function(jsonrpc) {
 }
 
 JsonRpcServer.prototype.process = function(request) {
-	var method = this[request.method];
+	var method = this.methods[request.method];
 	var result;
 	if(method) {
 		var len = (request.params instanceof Array) ? request.params.length : 1;
@@ -57,7 +59,7 @@ JsonRpcServer.prototype.process = function(request) {
 };
 
 JsonRpcServer.prototype.on = function(method, nparams, handler) {		
-	this[method] = {nparams: nparams, handler: handler};
+	this.methods[method] = {nparams: nparams, handler: handler};
 };
 
 JsonRpcServer.prototype.responseWithError = function(id, code, message, data) {

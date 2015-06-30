@@ -19,7 +19,7 @@
  */
 
 var http = require('http');
-var rpcserver = require('./HILRemoteServer');
+var rpcserver = require('./hil/HILRemoteServer');
 //rpcserver.setBoard(myboard);
 
 process.env.PORT = 2055;

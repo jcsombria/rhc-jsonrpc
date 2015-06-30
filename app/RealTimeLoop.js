@@ -1,5 +1,5 @@
 /**
- * HIL Remote Protocol - Boards Interface definition
+ * "Real Time" Loop
  * author: Jesús Chacón <jcsombria@gmail.com>
  *
  * Copyright (C) 2014 Jesús Chacón
@@ -31,18 +31,20 @@ RealTimeLoop.prototype.run = function() {
 }
 
 RealTimeLoop.prototype.tic = function() {
+
+  
 //	var start = new Date().getMilliseconds();
-	var sensorsReading = this.hardware.readAllInputs();
+//	var sensorsReading = this.hardware.readAllInputs();
 
 //	var controlAction = controller.update(sensorsReading);
-	controlAction = { 'output1':Math.random(), 'output2':Math.random() };
-	this.hardware.writeAllOutputs(controlAction);
+//	controlAction = { 'output1':Math.random(), 'output2':Math.random() };
+//	this.hardware.writeAllOutputs(controlAction);
 
 //	var end = new Date().getMilliseconds();
 //	var time = end - start;
 //	console.log('Elapsed Time: '+time);
-	console.log(sensorsReading);
-	console.log(controlAction);
+//	console.log(sensorsReading);
+//	console.log(controlAction);
 }
 
 
