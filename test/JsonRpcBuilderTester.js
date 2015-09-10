@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-var JsonRpcBuilder = require('./JsonRpcBuilder');
+var JsonRpcBuilder = require('../jsonrpc/JsonRpcBuilder');
 
 var JsonRpcBuilderTester = {
 	testRequest: function() {
