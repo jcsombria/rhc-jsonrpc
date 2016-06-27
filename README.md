@@ -1,7 +1,7 @@
 RHI Server
 ==========
 
-Server implementation of the Remote Hardware Interface (RHI) protocol, in Node.js using JSON-RPC and WebSockets. The protocol allow to interoperate external softare with hardware such as Beaglebone Black or Raspberry PI, and it is mainly focused on remote labs development.
+Server implementation of the Remote Hardware Interface (RHI) protocol, in Node.js using JSON-RPC and WebSockets. The protocol allows to interoperate external softare with hardware such as Beaglebone Black or Raspberry PI, and it is mainly focused on remote labs development.
 
 ## Introduction
 
