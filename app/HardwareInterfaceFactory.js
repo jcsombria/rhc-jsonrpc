@@ -20,7 +20,6 @@
 var Conf = require('./Configuration')
 var BoardInterface = require('../board/BoardInterface');
 var Boards = require('../board/Boards');
-console.log(Conf)
 
 if(Conf.BeagleBoneBlack == true) {
   var Boards = require('../board/Boards');
