@@ -17,12 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Conf = require('./Configuration')
 var BoardInterface = require('../board/BoardInterface');
-var Board = require('../board/Board');
+var Boards = require('../board/Boards');
+console.log(Conf)
+
+if(Conf.BeagleBoneBlack == true) {
+  var Boards = require('../board/Boards');
+}
 
 var HardwareInterfaceFactory = {
 	makeTestHardwareInterface: function() {
-		testHardwareInterface = new BoardInterface(Board.TestBoard);
+		testHardwareInterface = new BoardInterface(Boards.TestBoard);
 		var variables = {
 			'variable1': 'P1',
 			'variable2': 'P2',
@@ -35,7 +41,7 @@ var HardwareInterfaceFactory = {
 	},
 
 	makeBeagleBoneBlackHardwareInterface: function() {
-		beagleBoneBlackInterface = new BoardInterface(Board.BeagleBoneBlack);
+		beagleBoneBlackInterface = new BoardInterface(BeagleBoneBoards.BeagleBoneBlack);
 		var readable = {
 			'motor1_speed': 'P9_35',
 			'motor2_speed': 'P9_36',
