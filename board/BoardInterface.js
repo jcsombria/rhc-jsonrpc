@@ -24,42 +24,46 @@ function BoardInterface(board) {
 	this.board = board;
 }
 
-/*BoardInterface.prototype.bindVariableToPin = function(variable, pin) {
-	if(this.hasVariable(variable) && this.board.hasPin(pin)) {
-		this.pinToVar[pin] = variable;
-		this.varToPin[variable] = pin;
-		variable.setRange(this.board.pinRange(pin));
-		if(this.board.isInput(pin)) {
-			this.inputs[variable] = pin;
-		} else {
-			this.outputs[variable] = pin;
-		}
+BoardInterface.prototype.getReading = function(variable) {
+	if(this.hasVariable(variable)) {
+			return this.vars[variable].getValue();
 	}
-}*/
+}
 
 BoardInterface.prototype.read = function(variable) {
 	if(this.hasVariable(variable)) {
 		var pin = this.vars[variable].getPin();
-		var value = this.board.read(pin);
-		return value;
+		if(pin != undefined) {
+			var value = this.board.read(pin);
+			this.vars[variable].setValue(value);
+			return value;
+		} else {
+			return this.vars[variable].getValue();
+		}
 	}
 	return 0;
 };
 
 BoardInterface.prototype.write = function(variable, value) {
 	if(this.hasVariable(variable)) {
-		this.vars[variable].setValue(value);
-		this.board.write(this.vars[variable].getPin(), value);
+		var pin = this.vars[variable].getPin();
+		if(pin != undefined) {
+			this.board.write(pin, value);
+		} else {
+			this.vars[variable].setValue(value);
+		}
 	}
 };
 
 BoardInterface.prototype.addVariable = function(name, pin) {
+	var variable = new Variable(name);
+	this.vars[name] = variable;
 	if(this.board.hasPin(pin)) {
-		var variable = new Variable(name);
 		variable.setPin(pin);
-		var range = this.board.pinRange;
+		var range = this.board.pinRange(pin);
 		variable.setRange(range['min'], range['max']);
-		this.vars[name] = variable;
+	} else {
+		variable.setRange(-Infinity, +Infinity);
 	}
 };
 
@@ -75,45 +79,33 @@ BoardInterface.prototype.hasVariable = function(variable) {
 	}
 };
 
-BoardInterface.prototype.addReadableVariable = function(name, pin) {
-	if(this.board.isOutput(pin)) {
-		this.addVariable(name, pin);
-	} else if(this.board.isInputOutput(pin)) {
-		this.addVariable(name, pin);
-		this.board.setInputMode(pin);
-	}
-}
-
 BoardInterface.prototype.setReadable = function(variable) {	
 	if(this.hasVariable(variable)) {
-		var pin =	this.vars[variable].getPin();
+		this.vars[variable].setReadable(true);
+		this.vars[variable].setWritable(false);
+		var pin = this.vars[variable].getPin();
 		if(this.board.isInputOutput(pin)) {
 			this.board.setInputMode(pin);
 		};
 	}
 }
 
-BoardInterface.prototype.addWritableVariable = function(name, pin) {
-	if(this.board.isOutput(pin)) {
-		this.addVariable(name, pin);
-	} else if(this.board.isInputOutput(pin)) {
-		this.addVariable(name, pin);
-		this.board.setOutputMode(pin);
-	}
-}
-
 BoardInterface.prototype.setWritable = function(variable) {
 	if(this.hasVariable(variable)) {
-		var pin =	this.vars[variable].getPin();
+		this.vars[variable].setReadable(false);
+		this.vars[variable].setWritable(true);
+		var pin = this.vars[variable].getPin();
 		if(this.board.isInputOutput(pin)) {
 			this.board.setOutputMode(pin);
 		};
 	}
 }
 
-BoardInterface.prototype.setReadableWritable = function() {
+BoardInterface.prototype.setReadableWritable = function(variable) {
 	if(this.hasVariable(variable)) {
-		var pin =	this.vars[variable].getPin();
+		this.vars[variable].setReadable(true);
+		this.vars[variable].setWritable(true);
+		var pin = this.vars[variable].getPin();
 		if(this.board.isInputOutput(pin)) {
 			this.board.setOutputMode(pin);
 		};
@@ -123,10 +115,9 @@ BoardInterface.prototype.setReadableWritable = function() {
 BoardInterface.prototype.getReadableVariables = function() {
 	var listOfInputVariables = [];
 	for(variable in this.vars) {
-		var pin = this.vars[variable].getPin();
-		if(this.board.isInput(pin)) {
+		if(this.vars[variable].isReadable()) {
 			listOfInputVariables.push(variable);
-		}
+		}		
 	}
 	return listOfInputVariables;
 }
@@ -134,21 +125,9 @@ BoardInterface.prototype.getReadableVariables = function() {
 BoardInterface.prototype.getWritableVariables = function() {
 	var listOfOutputVariables = [];
 	for(variable in this.vars) {
-		var pin = this.vars[variable].getPin();
-		if(this.board.isOutput(pin)) {
+		if(this.vars[variable].isWritable()) {
 			listOfOutputVariables.push(variable);
-		}
-	}
-	return listOfOutputVariables;
-}
-
-BoardInterface.prototype.getReadableAndWritableVariables = function() {
-	var listOfOutputVariables = [];
-	for(variable in this.vars) {
-		var pin = this.vars[variable].getPin();
-		if(this.board.isInputOutput(pin)) {
-			listOfOutputVariables.push(variable);
-		}
+		}		
 	}
 	return listOfOutputVariables;
 }

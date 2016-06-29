@@ -20,113 +20,48 @@
 
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
 var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
-var RHIPImpl = new JsonRpcServer();
+var RIPImpl = new JsonRpcServer();
 
-RHIPImpl.hardwareInterface = HardwareInterfaceFactory.makeTestHardwareInterface();
+RIPImpl.hardwareInterface = HardwareInterfaceFactory.makeTestHardwareInterface();
 
-RHIPImpl.init = function() {
-	this.on('connect', 0, RHIPImpl.connect.bind(this));
-	this.on('disconnect', 0, RHIPImpl.disconnect.bind(this));
-	this.on('open', 0, RHIPImpl.open.bind(this));
-	this.on('close', 0, RHIPImpl.stop.bind(this));
-	this.on('run', 0, RHIPImpl.run.bind(this));
-	this.on('stop', 0, RHIPImpl.stop.bind(this));
-	this.on('get', 2, RHIPImpl.get.bind(this));
-	this.on('set', 1, RHIPImpl.set.bind(this));
-	this.on('getValue', 1, RHIPImpl.getValue.bind(this));
-	this.on('setValue', 2, RHIPImpl.setValue.bind(this));
+RIPImpl.init = function() {
+	this.on('connect', 0, RIPImpl.connect.bind(this));
+	this.on('getMetadata', 0, RIPImpl.getMetadata.bind(this));
+	this.on('get', 1, RIPImpl.get.bind(this));
+	this.on('set', 2, RIPImpl.set.bind(this));
+	this.on('disconnect', 0, RIPImpl.disconnect.bind(this));
 }
 
-RHIPImpl.connect = function() {
-	return {'session-id': UUID()};
+RIPImpl.connect = function() {
+  return true;
 }
 
-function UUID() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-};
-
-RHIPImpl.setTransport = function(transport) {
-  this.transport = transport;
-}
-
-RHIPImpl.open = function() {
-	return {
-		methods: ['connect', 'disconnect', 'open', 'close', 'run', 'stop', 'get', 'set', 'getValue', 'setValue'],
-		read: this.hardwareInterface.getReadableVariables(),
-		write: this.hardwareInterface.getWritableVariables(),
-		read_write: this.hardwareInterface.getReadableAndWritableVariables(),
+RIPImpl.getMetadata = function() {
+	var meta= {
+		methods: ['connect', 'set', 'get', 'disconnect'],
+		readable: this.hardwareInterface.getReadableVariables(),
+		writable: this.hardwareInterface.getWritableVariables(),
 	};
+	return meta;
 }
-
-RHIPImpl.run = function() {
-	return {'state':'running'};
-}
-
-RHIPImpl.get = function(params) {
-	var variables = [params[0]];
-	var condition = [params[1]];
-	var result = {};
-	for (i=0; i<variables.length; i++) { 
-	  result[variables[i]] = this.hardwareInterface.read(variables[i]);
-	}
-	setTimeout(function(){
-	  var result = this.get(params);
-	  this.transport.send(JSON.stringify(result));
-	}.bind(this), 1000);
-	  
-	return result;
-}
-
-RHIPImpl._notify = function(result) {
-  this.transport.send(result);
-}
-
-RHIPImpl.set = function(params) {
-	var variables = params;
-	var result = {};
-	for(item in variables) {
-	  name = item;
-	  value = variables[item];
-	  result[item] = value;
-	  this.hardwareInterface.write(name, value)
+	
+RIPImpl.get = function(variables) {
+	result = [];
+	for (var i=0; i<variables.length; i++) {
+		result.push(this.hardwareInterface.read(variables[i]));
 	}
 	return result;
 }
 
-RHIPImpl.getValue = function(params) {
-	var variable = [params[0]];
-	var result = {};
-	var value = this.hardwareInterface.read(variable);	
-	result[variable] = value;
-	return result;
+RIPImpl.set = function(variables, values) {
+	for(var i=0; i<variables.length; i++) {
+		this.hardwareInterface.write(variables[i], values[i]);
+	}
 }
 
-RHIPImpl.setValue = function(params) {
-	var variable = params[0];
-	var value = params[1];
-	this.hardwareInterface.write(variable, value);
-	var result = {};
-	result[variable] = value;
-	return result;
+RIPImpl.disconnect = function() {
+	return true;
 }
 
-RHIPImpl.close = function() {
-	return {close:'not implemented'};
-}
-
-RHIPImpl.stop = function() {
-	return {stop:'not implemented'};
-}
-
-RHIPImpl.disconnect = function() {
-	return {disconnect:'not implemented'};
-}
-
-RHIPImpl.init();
-module.exports = RHIPImpl;
+RIPImpl.init();
+module.exports = RIPImpl;

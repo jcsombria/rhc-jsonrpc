@@ -19,9 +19,11 @@
 function Variable(name) {
 	this.name = name;
 	this.pin = undefined;
-	this.value = 0;	
+	this.value = 0;
 	this.minimum = -Infinity;
 	this.maximum = Infinity;
+	this.readable = false;
+	this.writable = false;
 }
 
 Variable.prototype.setValue = function(value) {
@@ -57,6 +59,22 @@ Variable.prototype.setPin = function(pin) {
 
 Variable.prototype.getPin = function() {
 	return this.pin;
+}
+
+Variable.prototype.setReadable = function(readable) {
+	this.readable = readable;
+}
+
+Variable.prototype.setWritable = function(writable) {
+	this.writable = writable;
+}
+
+Variable.prototype.isReadable = function() {
+	return this.readable;
+}
+
+Variable.prototype.isWritable = function() {
+	return this.writable;
 }
 
 module.exports = Variable;

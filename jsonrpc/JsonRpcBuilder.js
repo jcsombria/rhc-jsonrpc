@@ -21,18 +21,18 @@
 var JsonRpcBuilder = {
 	request: function(method, params, id) {
 		if(params && !(params instanceof Array)) {
-		  throw new InvalidParamsException();
-	  }
+			throw new InvalidParamsException();
+		}
 		var request = {
-		  jsonrpc: '2.0',
-		  method: method,
+			jsonrpc: '2.0',
+			method: method,
 		};
 		if(params !== undefined) {
-		  request.params = params;
+			request.params = params;
 		}
 		if(id !== undefined) {
-		  request.id = id;
-    }
+			request.id = id;
+		}
 		return request;
 	},
 

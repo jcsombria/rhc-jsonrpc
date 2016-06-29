@@ -70,12 +70,18 @@ JsonRpcServer.prototype.parse = function(jsonrpc) {
 
 JsonRpcServer.prototype.process = function(request) {
 	var method = this.methods[request.method];
+	var params;
 	var result;
 	if(method) {
-		if(request.params.length != method.nparams) {
-  	  var error = this.ERRORS['INVALID_PARAMS'];
+	  try {
+	    params = request.params.length;
+	  } catch(error) {
+	    params = 0;
+	  }
+    if(params != method.nparams) {
+      var error = this.ERRORS['INVALID_PARAMS'];
   		return this.responseWithError(request.id, error.code, error.message);
-		}
+ 		}
 		result = method.handler.apply(this, request.params);
 		return this.response(result, request.id);
 	} else {

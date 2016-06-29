@@ -131,6 +131,16 @@ function TestBoard() {
 
 TestBoard.prototype = GenericBoard.prototype;
 
+TestBoard.prototype.read = function(pin) {
+  return this.hwio[pin].value;
+};
+
+TestBoard.prototype.write = function(pin, value) {
+//  console.log(value);
+  this.hwio[pin].value = value;
+};
+
+
 // Module Exports
 module.exports.ioDir = ioDir;
 module.exports.ioType = ioType;

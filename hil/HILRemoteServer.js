@@ -20,70 +20,47 @@
 
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
 var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
-var RHIPImpl = new JsonRpcServer();
+var RIPImpl = new JsonRpcServer();
+var RealTimeLoop = require('../app/RealTimeLoop');
 
-RHIPImpl.hardwareInterface = HardwareInterfaceFactory.makeBeagleBoneBlackHardwareInterface();
+RIPImpl.hardwareInterface = HardwareInterfaceFactory.makeBeagleBoneBlackHardwareInterface();
 
-RHIPImpl.init = function() {
-	this.on('connect', 0, RHIPImpl.connect.bind(this));
-	this.on('open', 0, RHIPImpl.open.bind(this));
-	this.on('run', 0, RHIPImpl.run.bind(this));
-	this.on('getValue', 1, RHIPImpl.getValue.bind(this));
-	this.on('setValue', 2, RHIPImpl.setValue.bind(this));
-	this.on('sync', 0, RHIPImpl.sync.bind(this));
-	this.on('stop', 0, RHIPImpl.stop.bind(this));
-	this.on('disconnect', 0, RHIPImpl.disconnect.bind(this));
+RIPImpl.init = function() {
+	this.on('connect', 0, RIPImpl.connect.bind(this));
+	this.on('get', 1, RIPImpl.get.bind(this));
+	this.on('set', 2, RIPImpl.set.bind(this));
+	this.on('disconnect', 0, RIPImpl.disconnect.bind(this));
+	main = new RealTimeLoop();
+	main.setBoard(RIPImpl.hardwareInterface);
+	main.run();
 }
 
-RHIPImpl.connect = function() {
-	return 'connect';
-}
-	
-RHIPImpl.open = function() {
+RIPImpl.connect = function() {
 	return {
-		methods: ['connect', 'open', 'run', 'getValue', 'setValue', 'sync', 'stop', 'close', 'disconnect'],
+		methods: ['connect', 'set', 'get', 'disconnect'],
 		readable: this.hardwareInterface.getReadableVariables(),
-		writable: this.hardwareInterface.getWritableVariables() 
+		writable: this.hardwareInterface.getWritableVariables(),
 	};
 }
-
-RHIPImpl.close = function() {
-  return 'bye bye';
-}
-
-RHIPImpl.run = function() {
-	return 'run';
-}
-
-RHIPImpl.get = function(params) {
-	var variable = [params[0]];
-	var condition = [params[1]];
 	
-	return this.hardwareInterface.read(variable);
+RIPImpl.get = function(variables) {
+	result = [];
+	for (var i=0; i<variables.length; i++) {
+//		result.push(this.hardwareInterface.read(variables[i]));
+		result.push(this.hardwareInterface.getReading(variables[i]));
+	}
+	return result;
 }
 
-RHIPImpl.getValue = function(params) {
-	var variable = [params[0]];
-	return this.hardwareInterface.read(variable);
+RIPImpl.set = function(variables, values) {
+	for(var i=0; i<variables.length; i++) {
+		this.hardwareInterface.write(variables[i], values[i]);
+	}
 }
 
-RHIPImpl.setValue = function(params) {
-	var variable = params[0];
-	var value = params[1];	
-	this.hardwareInterface.write(variable, value);
-}
-
-RHIPImpl.sync = function() {
-	return 'sync';
-}
-
-RHIPImpl.stop = function() {
-	return 'stop';
-}
-
-RHIPImpl.disconnect = function() {
+RIPImpl.disconnect = function() {
 	return 'disconnect';
 }
 
-RHIPImpl.init();
-module.exports = RHIPImpl;
+RIPImpl.init();
+module.exports = RIPImpl;

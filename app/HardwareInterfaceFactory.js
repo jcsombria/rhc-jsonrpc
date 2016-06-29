@@ -35,32 +35,40 @@ var HardwareInterfaceFactory = {
 		for(variable in variables) {
 			var pin = variables[variable];
 			testHardwareInterface.addVariable(variable, pin);
+			testHardwareInterface.setReadableWritable(variable);
 		}
 		return testHardwareInterface;
 	},
 
 	makeBeagleBoneBlackHardwareInterface: function() {
-		beagleBoneBlackInterface = new BoardInterface(BeagleBoneBoards.BeagleBoneBlack);
-		var readable = {
-			'motor1_speed': 'P9_35',
-			'motor2_speed': 'P9_36',
-			'pulley_speed': 'P9_37',
-			'belt_tension': 'P9_38'
-		};
-		var writable = {
-			'motor1_control': 'P9_13',
-			'motor2_control': 'P9_14',
-		};
-		for(variable in readable) {
-			var pin = readable[variable];
-			beagleBoneBlackInterface.addVariable(variable, pin);
-			beagleBoneBlackInterface.setReadable(variable);
+		beagleBoneBlackInterface = new BoardInterface(Board.BeagleBoneBlack);
+		var variables = [
+			{ 'name': 'ball_height', 'pin': 'P9_36', 'type': 'in' },
+			{ 'name': 'fan_control', 'pin': 'P9_14', 'type': 'out' },
+			{ 'name': 'setpoint', 'type': 'in_out' },
+			{ 'name': 'kp', 'type': 'in_out' },
+			{ 'name': 'ki', 'type': 'in_out' },
+			{ 'name': 'kd', 'type': 'in_out' },
+		];
+		for(var i=0; i<variables.length; i++) {
+			var variable = variables[i];
+			beagleBoneBlackInterface.addVariable(variable['name'], variable['pin']);
+			switch(variable['type']) {
+				case 'in':
+					beagleBoneBlackInterface.setReadable(variable['name']);
+					break;
+				case 'in_out':
+					beagleBoneBlackInterface.setReadableWritable(variable['name']);
+					break;
+				case 'out':
+					beagleBoneBlackInterface.setWritable(variable['name']);
+					break;
+			}
 		}
-		for(variable in writable) {
-			var pin = writable[variable];
-			beagleBoneBlackInterface.addVariable(variable, pin);
-			beagleBoneBlackInterface.setWritable(variable);
-		}
+		beagleBoneBlackInterface.write('setpoint', 10);
+		beagleBoneBlackInterface.write('kp', 0.6);
+		beagleBoneBlackInterface.write('ki', 0.005);
+		beagleBoneBlackInterface.write('kd', 0.5);
 		return beagleBoneBlackInterface;
 	},
 }
