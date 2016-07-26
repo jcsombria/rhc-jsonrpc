@@ -45,9 +45,10 @@ function onRequest(request, response) {
 
   request.on('end', function () {
 		response.writeHead(200, headers);
-		console.log(body);
-		response.write(JSON.stringify(rpcserver.parse(body)));
-console.log(JSON.stringify(rpcserver.parse(body)));
+		//console.log(body);
+		var result = JSON.stringify(rpcserver.parse(body));
+		response.write(result);
+		//console.log(result);
 		response.end();
 	});
 }
