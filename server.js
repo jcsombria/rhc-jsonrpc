@@ -8,7 +8,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *	
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +20,6 @@
 
 var http = require('http');
 var rpcserver = require('./hil/HILRemoteServer');
-//rpcserver.setBoard(myboard);
 
 process.env.PORT = 2055;
 process.env.IP = 'localhost';
@@ -36,7 +35,7 @@ function onRequest(request, response) {
 			'Content-Type': 'application/json', 
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
-			'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+			'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
 		}
 	var body = '';
 //  request.setEncoding('utf8');
@@ -46,7 +45,7 @@ function onRequest(request, response) {
 
   request.on('end', function () {
 		response.writeHead(200, headers);
-console.log(body);
+//		console.log(body);
 		response.write(JSON.stringify(rpcserver.parse(body)));
 		response.end();
 	});

@@ -20,10 +20,39 @@
 
 function JsonRpcServer() {
   this.methods = {};
+  this.ERRORS = {
+    PARSE_ERROR: { // An error occurred on the server while parsing the JSON text.
+      code: -32700,
+      message: 'Invalid JSON was received by the server.',
+    },
+    INVALID_REQUEST: {
+      code: -32600,
+      message: 'The JSON sent is not a valid Request object.',
+    },
+    METHOD_NOT_FOUND: {
+      code: -32601,
+      message: 'Method not found. The method does not exist / is not available.',
+    },
+    INVALID_PARAMS: { // Invalid method parameter(s).
+      code: -32602,
+      message: 'Invalid params',
+    },
+    INTERNAL_ERROR: {
+      code: -32603,
+      message:'Internal JSON-RPC error.',
+    },
+//-32000 to -32099	Server error	Reserved for implementation-defined server-errors.
+  };
 }
 
 JsonRpcServer.prototype.parse = function(jsonrpc) {
-	var methodCall = JSON.parse(jsonrpc);
+	var methodCall;
+  try {
+     methodCall = JSON.parse(jsonrpc);
+  } catch(e) {
+    var error = this.ERRORS['PARSE_ERROR'];
+    return this.responseWithError(null, error.code, error.message);
+  }
 	var isBatchMode = (methodCall instanceof Array);
 	var result;
 	if(isBatchMode) {
@@ -41,19 +70,23 @@ JsonRpcServer.prototype.parse = function(jsonrpc) {
 
 JsonRpcServer.prototype.process = function(request) {
 	var method = this.methods[request.method];
+	var params;
 	var result;
 	if(method) {
-		var len = (request.params instanceof Array) ? request.params.length : 1;
-		var nparams = request.params ? len : 0;
-		if(nparams != method.nparams && !len)
-			return this.responseWithError(request.id, -32602, 'Invalid params');
-		result = method.handler(request.params);
-		if(request.id !== undefined)
-			return this.response(result, request.id);
-		else
-		return this.response(result);
+	  try {
+	    params = request.params.length;
+	  } catch(error) {
+	    params = 0;
+	  }
+    if(params != method.nparams) {
+      var error = this.ERRORS['INVALID_PARAMS'];
+  		return this.responseWithError(request.id, error.code, error.message);
+ 		}
+		result = method.handler.apply(this, request.params);
+		return this.response(result, request.id);
 	} else {
-		return this.responseWithError(request.id, -32601, 'Method not found');
+	  error = this.ERRORS['METHOD_NOT_FOUND'];
+		return this.responseWithError(request.id, error.code, error.message);
 	}
 	return result;
 };
@@ -68,15 +101,20 @@ JsonRpcServer.prototype.responseWithError = function(id, code, message, data) {
 		error: {
 			code: code,
 			message: message,
-			data: data
+			data: data,
 		},
-		id: id
+		id: id,
 	};
 };
 
 JsonRpcServer.prototype.response = function(result, id) {
-	var response = {jsonrpc: '2.0',	result: result};
-	if(id!==undefined) response.id = id;
+	var response = {
+	  jsonrpc: '2.0',
+	  result: result,
+  };
+	if(id !== undefined) {
+    response.id = id;
+  }
 	return response;
 }
 

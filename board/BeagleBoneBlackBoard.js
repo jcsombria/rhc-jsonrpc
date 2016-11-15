@@ -17,126 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+var Board = require('./Boards');
 var bonescript = require('bonescript');
- 
-const ioType = {
-  ANALOG:"analog", 
-	DIGITAL:"digital"
-};
+var ioDir = Board.ioDir;
+var ioDir = Board.ioType;
 
-const ioDir = {
-	IN:"in", 
-	OUT:"out", 
-	IN_OUT:"in_out"
-};	
-
-function GenericBoard() {
-	this.name = "Generic Board";
-}
-
-GenericBoard.prototype.hasPin = function(pin) {
-	if(this.hwio[pin]) {
-		return true;
-	} else {
-		return false;
-	}	
-};
-
-GenericBoard.prototype.isInput = function(pin) {	
-	var isInput = this.hasPin(pin) && this.hwio[pin].current_dir == ioDir.IN;
-	return isInput;
-}
-
-GenericBoard.prototype.isOutput = function(pin) {
-	var isOutput = this.hasPin(pin) && this.hwio[pin].current_dir == ioDir.OUT;
-	return isOutput;
-}
-
-GenericBoard.prototype.isInputOutput = function(pin) {
-	return (this.hasPin(pin) && this.hwio[pin].dir == ioDir.IN_OUT);
-}
-
-GenericBoard.prototype.pinRange = function(pin) {
-	if(this.hasPin(pin)) {
-		return this.hwio[pin].range;
-	} else {
-		var defaultPinRange = { min:0, max:0 };
-		return defaultPinRange;
-	}
-}
-
-GenericBoard.prototype.inRange = function(pin, value) {
-  return value > this.hwio[pin].range.min && value < this.hwio[pin].range.max;
-}
-
-GenericBoard.prototype.read = function(pin) {
-	if(this.isReadable(pin)) {
-		return this.hwio[pin].value;
-	}
-}
-
-GenericBoard.prototype.isReadable = function(pin) {
-  return this.hwio[pin] != undefined && (this.hwio[pin].dir == ioDir.IN
-      || this.hwio[pin].dir == ioDir.IN_OUT);
-}
-
-GenericBoard.prototype.write = function(pin, value) {
-  if(this.isWritable(pin) && this.inRange(pin, value)) {
-	  this.hwio[pin].value = value;
-	}
-}
-
-GenericBoard.prototype.isWritable = function(pin) {
-  return (this.hwio[pin] != undefined) && (this.hwio[pin].dir == ioDir.OUT
-      || this.hwio[pin].dir == ioDir.IN_OUT);
-}
-
-GenericBoard.prototype.pinRange = function(pin) {
-	if(this.hasPin(pin)) {
-		return this.hwio[pin].range;
-	} else {
-		var defaultPinRange = { min:0, max:0 };
-		return defaultPinRange;
-	}
-}
-
-GenericBoard.prototype.setInputMode = function(pin) {
-	if(this.isInputOutput(pin)) {
-		this.hwio[pin].current_dir = ioDir.IN;
-	}
-}
-
-GenericBoard.prototype.setOutputMode = function(pin) {
-	if(this.isInputOutput(pin)) {
-		this.hwio[pin].current_dir = ioDir.OUT;
-	}
-}
-
-GenericBoard.prototype.setInputOutputMode = function(pin) {
-	if(this.isInputOutput(pin)) {
-		this.hwio[pin].current_dir = ioDir.IN_OUT;
-	}
-}
-
-// Test dummy board
-function TestBoard() {
-	this.name = "Test Board";
+// BeagleBone Black board
+var BeagleBoneBlack = function() {
+	this.name = "BeagleBone Black Board";
 
 	this.hwio = {
-		'P1': {	name:'IO1', range: {min:0.0, max:5.0}, dir:ioDir.IN_OUT, value: 0.0 },
-		'P2': {	name:'IO2', range: {min:5.0, max:5.0}, dir:ioDir.IN_OUT, value: 0.0	},
-		'P3': {	name:'IO3', range: {min:0.0, max:5.0}, dir:ioDir.IN_OUT,  value: 0.0 },
-		'P4': {	name:'IO4', range: {min:0.0, max:5.0}, dir:ioDir.IN_OUT, value: 0.0 },
-	}
-}
-
-TestBoard.prototype = GenericBoard.prototype;
-
-// Beaglebone Black Board
-function BeagleBoneBlack() {
-    this.name = "BeagleBone Black Board";
-
-    this.hwio = {
+//		"var": {	name:'VARIABLE', range: {min:0.0, max:1.8},	dir:ioDir.IN_OUT, current_dir:ioDir.IN_OUT },
 		"P8_1": {	name:'DGND', range: {min:0.0, max:1.8},	dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_2": {	name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_3": {	name:'VDD_5V', range: {min:5.0, max:5.0},	dir:ioDir.OUT, current_dir:ioDir.OUT },
@@ -181,9 +72,9 @@ function BeagleBoneBlack() {
 		"P8_42": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_43": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_44": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
-		"P9_1": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
-		"P9_2": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
-		"P9_3": { name:'VDD_5V', range: {min:5.0, max:5.0},	dir:ioDir.OUT, current_dir:ioDir.OUT },
+		"P9_1": {	name:'DGND', range: {min:0.0, max:1.8},	dir:ioDir.OUT, current_dir:ioDir.OUT },
+		"P9_2": {	name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
+		"P9_3": {	name:'VDD_5V', range: {min:5.0, max:5.0},	dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P9_4": { name:'VDD_5V', range: {min:5.0, max:5.0}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P9_5": { name:'SYS_5V', range: {min:5.0, max:5.0}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P9_6": { name:'SYS_5V', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
@@ -228,38 +119,71 @@ function BeagleBoneBlack() {
 	};
 }
 
-BeagleBoneBlack.prototype = GenericBoard.prototype;
+BeagleBoneBlack.prototype.hasPin = function(pin) {
+	if(this.hwio[pin]) {
+		return true;
+	} else {
+		return false;
+	}	
+};
+
+BeagleBoneBlack.prototype.isInput = function(pin) {
+	var isInput = this.hasPin(pin) && this.hwio[pin].current_dir == ioDir.IN;
+	return isInput;
+}
+
+BeagleBoneBlack.prototype.isOutput = function(pin) {
+	var isOutput = this.hasPin(pin) && this.hwio[pin].current_dir == ioDir.OUT;
+	return isOutput;
+}
+
+BeagleBoneBlack.prototype.isInputOutput = function(pin) {
+	return (this.hasPin(pin) && this.hwio[pin].dir == ioDir.IN_OUT);
+}
+
+BeagleBoneBlack.prototype.pinRange = function(pin) {
+	if(this.hasPin(pin)) {
+		return this.hwio[pin].range;
+	} else {
+		var defaultPinRange = { min:0, max:0 };
+		return defaultPinRange;
+	}
+}
 
 BeagleBoneBlack.prototype.read = function(pin) {
-	if(this.isReadable(pin)) {
-		return bonescript.analogRead(pin);
+	if(this.isInput(pin)) {
+//		return bonescript.analogRead(pin);
 	}
-};
+}
 
 BeagleBoneBlack.prototype.write = function(pin, value) {
-	if(this.isWritable(pin)) {
-		return bonescript.analogWrite(pin, value);
-		return true;
+	if(this.isOutput(pin) && value >= 0 && value <= 1) {
+//		return bonescript.analogWrite(pin, value);
 	}
-};
+}
+
+BeagleBoneBlack.prototype.pinRange = function(pin) {
+	if(this.hasPin(pin)) {
+		return this.hwio[pin].range;
+	} else {
+		var defaultPinRange = { min:0, max:0 };
+		return defaultPinRange;
+	}
+}
 
 BeagleBoneBlack.prototype.setInputMode = function(pin) {
 	if(this.isInputOutput(pin)) {
-		bonescript.pinMode(pin, bonescript.INPUT);
+//		bonescript.pinMode(bonescript.INPUT);
 		this.hwio[pin].current_dir = ioDir.IN;
 	}
-};
+}
 
 BeagleBoneBlack.prototype.setOutputMode = function(pin) {
 	if(this.isInputOutput(pin)) {
-		bonescript.pinMode(pin, bonescript.OUTPUT);
+//		bonescript.pinMode(bonescript.OUTPUT);
 		this.hwio[pin].current_dir = ioDir.OUT;
 	}
-};
+}
 
 // Module Exports
-module.exports.ioDir = ioDir;
-module.exports.ioType = ioType;
-module.exports.GenericBoard = GenericBoard;
-module.exports.TestBoard = new TestBoard();
 module.exports.BeagleBoneBlack = new BeagleBoneBlack();
