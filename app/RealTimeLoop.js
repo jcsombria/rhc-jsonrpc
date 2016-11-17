@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var DataLogger = require('./DataLogger');
+
 function RealTimeLoop() {
 }
 
@@ -66,10 +68,6 @@ var controller = {
         this.kp = this.hardware.read('kp') * this.c;
         this.ki = this.hardware.read('ki') * this.c;
         this.kd = this.hardware.read('kd') * this.c;
-        var data = {
-        	'height': this.sensor,
-        }
-        DataLogger.log(data);
  	},
 	
 	update: function (y) {
@@ -77,6 +75,11 @@ var controller = {
         if((++this.step) == this.oversampling) {
 		    var x = this.sensor;
 			var h = 5.5e2*Math.pow(x, 3) - 9.2e2*Math.pow(x, 2) + 5.3e2*x - 94.5;
+    		var data = {
+        		'height': this.sensor,
+        		'height_converted': h,
+    	    }
+	        DataLogger.log(data);
 			this.y = this.sat(h, 0, 35);
             this.step = 0;
             this.sensor = 0;
