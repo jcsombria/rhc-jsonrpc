@@ -62,21 +62,25 @@ function DataLogger() {
   this.measurement = 'levitador';
 
   this.log = function(fields) {
-    data = new Data(this.measurement, this.tags, fields, Date.now());
+    var timestamp = fields.timestamp;
+    var fieldsWithoutTimestamp = fields;
+    delete fieldsWithoutTimestamp.timestamp;
+    data = new Data(this.measurement, this.tags, fieldsWithoutTimestamp, timestamp);
     this.data.push(data);
   }
 
   this.flush = function(measure, timestamp) {
-    var points = this.data.length;
-    if(points == 0) {
+    var point = this.data.shift();
+    if(point == undefined) {
       return;
     }
     var message = [];
-    for (var i=0; i<points; i++) {
-      message += this.data[i].toString();
+    while(point != undefined) {
+      message += point.toString();
+      point = this.data.shift();
     }
     var options = {
-      host: 'localhost',
+      host: '10.195.2.208',
       port: '8086',
       path: '/write?db=mydb&precision=ms',
       method: 'POST',
@@ -86,12 +90,10 @@ function DataLogger() {
       }
     };
 
-    var req = http.request(options);
-    //   write data to request body
-    req.write(message);
-    req.end();
-console.log(message);
-    this.data = [];
+    // Send points to data server
+//    var req = http.request(options);
+//    req.write(message);
+//    req.end();
   };
 
   this.run = function() {
