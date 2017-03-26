@@ -17,17 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var Board = require('./Boards');
 var bonescript = require('bonescript');
+var Board = require('./Boards');
 var ioDir = Board.ioDir;
-var ioDir = Board.ioType;
 
-// BeagleBone Black board
-var BeagleBoneBlack = function() {
-	this.name = "BeagleBone Black Board";
+// Beaglebone Black Board
+function BeagleBoneBlack() {
+    this.name = "BeagleBone Black Board";
 
-	this.hwio = {
-//		"var": {	name:'VARIABLE', range: {min:0.0, max:1.8},	dir:ioDir.IN_OUT, current_dir:ioDir.IN_OUT },
+    this.hwio = {
 		"P8_1": {	name:'DGND', range: {min:0.0, max:1.8},	dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_2": {	name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_3": {	name:'VDD_5V', range: {min:5.0, max:5.0},	dir:ioDir.OUT, current_dir:ioDir.OUT },
@@ -72,9 +70,9 @@ var BeagleBoneBlack = function() {
 		"P8_42": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_43": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P8_44": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
-		"P9_1": {	name:'DGND', range: {min:0.0, max:1.8},	dir:ioDir.OUT, current_dir:ioDir.OUT },
-		"P9_2": {	name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
-		"P9_3": {	name:'VDD_5V', range: {min:5.0, max:5.0},	dir:ioDir.OUT, current_dir:ioDir.OUT },
+		"P9_1": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
+		"P9_2": { name:'DGND', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
+		"P9_3": { name:'VDD_5V', range: {min:5.0, max:5.0},	dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P9_4": { name:'VDD_5V', range: {min:5.0, max:5.0}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P9_5": { name:'SYS_5V', range: {min:5.0, max:5.0}, dir:ioDir.OUT, current_dir:ioDir.OUT },
 		"P9_6": { name:'SYS_5V', range: {min:0.0, max:1.8}, dir:ioDir.OUT, current_dir:ioDir.OUT },
@@ -119,71 +117,34 @@ var BeagleBoneBlack = function() {
 	};
 }
 
-BeagleBoneBlack.prototype.hasPin = function(pin) {
-	if(this.hwio[pin]) {
-		return true;
-	} else {
-		return false;
-	}	
-};
-
-BeagleBoneBlack.prototype.isInput = function(pin) {
-	var isInput = this.hasPin(pin) && this.hwio[pin].current_dir == ioDir.IN;
-	return isInput;
-}
-
-BeagleBoneBlack.prototype.isOutput = function(pin) {
-	var isOutput = this.hasPin(pin) && this.hwio[pin].current_dir == ioDir.OUT;
-	return isOutput;
-}
-
-BeagleBoneBlack.prototype.isInputOutput = function(pin) {
-	return (this.hasPin(pin) && this.hwio[pin].dir == ioDir.IN_OUT);
-}
-
-BeagleBoneBlack.prototype.pinRange = function(pin) {
-	if(this.hasPin(pin)) {
-		return this.hwio[pin].range;
-	} else {
-		var defaultPinRange = { min:0, max:0 };
-		return defaultPinRange;
-	}
-}
+BeagleBoneBlack.prototype = GenericBoard.prototype;
 
 BeagleBoneBlack.prototype.read = function(pin) {
-	if(this.isInput(pin)) {
-//		return bonescript.analogRead(pin);
+	if(this.isReadable(pin)) {
+		return bonescript.analogRead(pin);
 	}
-}
+};
 
 BeagleBoneBlack.prototype.write = function(pin, value) {
-	if(this.isOutput(pin) && value >= 0 && value <= 1) {
-//		return bonescript.analogWrite(pin, value);
+	if(this.isWritable(pin)) {
+		return bonescript.analogWrite(pin, value);
+		return true;
 	}
-}
-
-BeagleBoneBlack.prototype.pinRange = function(pin) {
-	if(this.hasPin(pin)) {
-		return this.hwio[pin].range;
-	} else {
-		var defaultPinRange = { min:0, max:0 };
-		return defaultPinRange;
-	}
-}
+};
 
 BeagleBoneBlack.prototype.setInputMode = function(pin) {
 	if(this.isInputOutput(pin)) {
-//		bonescript.pinMode(bonescript.INPUT);
+		bonescript.pinMode(pin, bonescript.INPUT);
 		this.hwio[pin].current_dir = ioDir.IN;
 	}
-}
+};
 
 BeagleBoneBlack.prototype.setOutputMode = function(pin) {
 	if(this.isInputOutput(pin)) {
-//		bonescript.pinMode(bonescript.OUTPUT);
+		bonescript.pinMode(pin, bonescript.OUTPUT);
 		this.hwio[pin].current_dir = ioDir.OUT;
 	}
-}
+};
 
 // Module Exports
 module.exports.BeagleBoneBlack = new BeagleBoneBlack();
