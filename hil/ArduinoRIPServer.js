@@ -17,24 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-var cp = require('child_process');
+//var cp = require('child_process');
 var spawnSync = cp.spawnSync;
 var fs = require('fs');
 
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
-var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
-var RIPImpl = new JsonRpcServer();
+var ArduinoRipServer = new JsonRpcServer();
 
-RIPImpl.init = function() {
-	this.on('connect', 0, RIPImpl.connect.bind(this));
-	this.on('get', 1, RIPImpl.get.bind(this));
-	this.on('set', 2, RIPImpl.set.bind(this));
-	this.on('load', 1, RIPImpl.load.bind(this));
-	this.on('disconnect', 0, RIPImpl.disconnect.bind(this));
-	this.hardwareInterface = HardwareInterfaceFactory.makeArduinoInterface();
+ArduinoRipServer.init = function() {
+	this.on('connect', 0, ArduinoRipServer.connect.bind(this));
+	this.on('get', 1, ArduinoRipServer.get.bind(this));
+	this.on('set', 2, ArduinoRipServer.set.bind(this));
+	this.on('load', 1, ArduinoRipServer.load.bind(this));
+	this.on('disconnect', 0, ArduinoRipServer.disconnect.bind(this));
 }
 
-RIPImpl.connect = function() {
+ArduinoRIPServer.setHardwareInterface = function(hardwareInterface) {
+  this.hardwareInterface = hardwareInterface;
+}
+
+ArduinoRipServer.connect = function() {
 	return {
 	  info: {
   	  name: 'Air Levitator System Lab',
@@ -61,7 +63,7 @@ RIPImpl.connect = function() {
 		  },
 		  'disconnect': {
 		    'purpose': 'To finish the connection with the lab.',
-		    'params': {},
+		    'params': '',
 		  },
 		},
 		readable: this.hardwareInterface.getReadableVariables(),
@@ -69,7 +71,7 @@ RIPImpl.connect = function() {
 	};
 }
 	
-RIPImpl.get = function(variables) {
+ArduinoRipServer.get = function(variables) {
 	result = [];
 	for (var i=0; i<variables.length; i++) {
 		var value = this.hardwareInterface.read(variables[i])
@@ -78,14 +80,14 @@ RIPImpl.get = function(variables) {
 	return result;
 }
 
-RIPImpl.set = function(variables, values) {
+ArduinoRipServer.set = function(variables, values) {
 	for(var i=0; i<variables.length; i++) {
 		this.hardwareInterface.write(variables[i], values[i]);
 	}
 }
 
 
-RIPImpl.load = function(controller) {
+ArduinoRipServer.load = function(controller) {
 	this.hardwareInterface.disconnect(function() {
 		this._generate(controller, function() {
 			this._upload();
@@ -94,7 +96,7 @@ RIPImpl.load = function(controller) {
 	}.bind(this));
 }
 
-RIPImpl._upload = function() {
+ArduinoRipServer._upload = function() {
 	try {
 		const result = spawnSync('make', ['upload', '-C','tmp'], {
 			stdio: 'inherit',
@@ -105,7 +107,7 @@ RIPImpl._upload = function() {
 	}
 }
 
-RIPImpl._generate = function(controller, callback) {
+ArduinoRipServer._generate = function(controller, callback) {
 	var code = 'double PID::update(double y) {\n' + controller + '}';
 	var input = fs.createReadStream(process.env.PWD + '/arduino_code/levitador.ino');
 	var output = fs.createWriteStream(process.env.PWD + '/tmp/levitador.ino');
@@ -118,7 +120,7 @@ RIPImpl._generate = function(controller, callback) {
 	});
 }
 
-RIPImpl._build = function() {
+ArduinoRipServer._build = function() {
 	try {
 		const result = spawnSync('make', ['-C','tmp'], {
 			cwd: process.env.PWD,
@@ -129,9 +131,9 @@ RIPImpl._build = function() {
 	}	
 }
 
-RIPImpl.disconnect = function() {
+ArduinoRipServer.disconnect = function() {
 	return 'disconnect';
 }
 
-RIPImpl.init();
-module.exports = RIPImpl;
+ArduinoRipServer.init();
+module.exports = ArduinoRipServer;

@@ -19,26 +19,59 @@
  */
 
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
-var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
-var RHIPImpl = new JsonRpcServer();
+var DummyServer = new JsonRpcServer();
 
-RHIPImpl.hardwareInterface = HardwareInterfaceFactory.makeTestHardwareInterface();
-
-RHIPImpl.init = function() {
-	this.on('connect', 0, RHIPImpl.connect.bind(this));
-	this.on('disconnect', 0, RHIPImpl.disconnect.bind(this));
-	this.on('open', 0, RHIPImpl.open.bind(this));
-	this.on('close', 0, RHIPImpl.stop.bind(this));
-	this.on('run', 0, RHIPImpl.run.bind(this));
-	this.on('stop', 0, RHIPImpl.stop.bind(this));
-	this.on('get', 2, RHIPImpl.get.bind(this));
-	this.on('set', 1, RHIPImpl.set.bind(this));
-	this.on('getValue', 1, RHIPImpl.getValue.bind(this));
-	this.on('setValue', 2, RHIPImpl.setValue.bind(this));
+DummyServer.init = function() {
+	this.on('connect', 0, DummyServer.connect.bind(this));
+	this.on('disconnect', 0, DummyServer.disconnect.bind(this));
+	this.on('open', 0, DummyServer.open.bind(this));
+	this.on('close', 0, DummyServer.stop.bind(this));
+	this.on('run', 0, DummyServer.run.bind(this));
+	this.on('stop', 0, DummyServer.stop.bind(this));
+	this.on('get', 2, DummyServer.get.bind(this));
+	this.on('set', 1, DummyServer.set.bind(this));
+	this.on('getValue', 1, DummyServer.getValue.bind(this));
+	this.on('setValue', 2, DummyServer.setValue.bind(this));
 }
 
-RHIPImpl.connect = function() {
-	return {'session-id': UUID()};
+DummyServer.setHardwareInterface = function(hardwareInterface) {
+  this.hardwareInterface = hardwareInterface;
+}
+
+DummyServer.connect = function() {
+//	return {'session-id': UUID()};
+  return {
+    info: {
+  	  name: 'Air Levitator System Lab',
+  	  description: 'Air Levitator System Lab',
+	  },
+    methods: {
+		  'connect': {
+		    'purpose': 'To establish a connection with the lab.',
+        'params': {}
+		  },
+		  'set': {
+		    'purpose': 'To write a server variable',
+        'params': {
+            'variables': '[string]',
+            'values': '[]',
+		    },
+ 		  },
+		  'get': {
+		    'purpose': 'To read a server variable',
+        'params': {
+            'variables': '[string]',
+            'values': '[]',
+		    },
+		  },
+		  'disconnect': {
+		    'purpose': 'To finish the connection with the lab.',
+		    'params': {},
+		  },
+		},
+    readable: this.hardwareInterface.getReadableVariables(),
+		writable: this.hardwareInterface.getWritableVariables(),
+	};
 }
 
 function UUID() {
@@ -51,24 +84,51 @@ function UUID() {
     return uuid;
 };
 
-RHIPImpl.setTransport = function(transport) {
+DummyServer.setTransport = function(transport) {
   this.transport = transport;
 }
 
-RHIPImpl.open = function() {
-	return {
-		methods: ['connect', 'disconnect', 'open', 'close', 'run', 'stop', 'get', 'set', 'getValue', 'setValue'],
-		read: this.hardwareInterface.getReadableVariables(),
-		write: this.hardwareInterface.getWritableVariables(),
-		read_write: this.hardwareInterface.getReadableAndWritableVariables(),
+DummyServer.open = function() {
+return {
+	  info: {
+  	  name: 'Air Levitator System Lab',
+  	  description: 'Air Levitator System Lab',
+	  },
+//methods: ['connect', 'disconnect', 'open', 'close', 'run', 'stop', 'get', 'set', 'getValue', 'setValue'],
+		methods: {
+		  'connect': {
+		    'purpose': 'To establish a connection with the lab.',
+        'params': {},
+		  },
+		  'set': {
+		    'purpose': 'To write a server variable',
+        'params': {
+            'variables': '[string]',
+            'values': '[]',
+		    },
+ 		  },
+		  'get': {
+		    'purpose': 'To read a server variable',
+        'params': {
+            'variables': '[string]',
+            'values': '[]',
+		    },
+		  },
+		  'disconnect': {
+		    'purpose': 'To finish the connection with the lab.',
+		    'params': '',
+		  },
+		},
+		readable: this.hardwareInterface.getReadableVariables(),
+		writable: this.hardwareInterface.getWritableVariables(),
 	};
 }
 
-RHIPImpl.run = function() {
+DummyServer.run = function() {
 	return {'state':'running'};
 }
 
-RHIPImpl.get = function(params) {
+DummyServer.get = function(params) {
 	var variables = [params[0]];
 	var condition = [params[1]];
 	var result = {};
@@ -83,11 +143,11 @@ RHIPImpl.get = function(params) {
 	return result;
 }
 
-RHIPImpl._notify = function(result) {
+DummyServer._notify = function(result) {
   this.transport.send(result);
 }
 
-RHIPImpl.set = function(params) {
+DummyServer.set = function(params) {
 	var variables = params;
 	var result = {};
 	for(item in variables) {
@@ -99,7 +159,7 @@ RHIPImpl.set = function(params) {
 	return result;
 }
 
-RHIPImpl.getValue = function(params) {
+DummyServer.getValue = function(params) {
 	var variable = [params[0]];
 	var result = {};
 	var value = this.hardwareInterface.read(variable);	
@@ -107,7 +167,7 @@ RHIPImpl.getValue = function(params) {
 	return result;
 }
 
-RHIPImpl.setValue = function(params) {
+DummyServer.setValue = function(params) {
 	var variable = params[0];
 	var value = params[1];
 	this.hardwareInterface.write(variable, value);
@@ -116,17 +176,17 @@ RHIPImpl.setValue = function(params) {
 	return result;
 }
 
-RHIPImpl.close = function() {
+DummyServer.close = function() {
 	return {close:'not implemented'};
 }
 
-RHIPImpl.stop = function() {
+DummyServer.stop = function() {
 	return {stop:'not implemented'};
 }
 
-RHIPImpl.disconnect = function() {
+DummyServer.disconnect = function() {
 	return {disconnect:'not implemented'};
 }
 
-RHIPImpl.init();
-module.exports = RHIPImpl;
+DummyServer.init();
+module.exports = DummyServer;
