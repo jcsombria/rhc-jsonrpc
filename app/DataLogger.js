@@ -91,9 +91,9 @@ function DataLogger() {
     };
 
     // Send points to data server
-//    var req = http.request(options);
-//    req.write(message);
-//    req.end();
+    var req = http.request(options);
+    req.write(message);
+    req.end();
   };
 
   this.run = function() {
