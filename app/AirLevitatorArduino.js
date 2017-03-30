@@ -20,7 +20,7 @@
 var BoardInterface = require('../board/BoardInterface');
 var Arduino = require('../board/Arduino');
 var HttpServer = require('../HttpServer');
-var rpcserver = require('../hil/HILRemoteServer');
+var rpcserver = require('../hil/ArduinoRIPServer');
 		
 var App = {
 	start: function() {
@@ -53,7 +53,7 @@ var App = {
 					break;
 			}
 		}
-    rpcserver.setHardwareInterface(arduinoInterface);
+	    rpcserver.setHardwareInterface(arduinoInterface);
 		this.httpserver = new HttpServer();
 		this.httpserver.setRPCServer(rpcserver);
 		this.httpserver.start();
