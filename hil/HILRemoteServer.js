@@ -22,16 +22,33 @@ var spawnSync = cp.spawnSync;
 var fs = require('fs');
 
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
-var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
 var RIPImpl = new JsonRpcServer();
 
 RIPImpl.init = function() {
-	this.on('connect', 0, RIPImpl.connect.bind(this));
-	this.on('get', 1, RIPImpl.get.bind(this));
-	this.on('set', 2, RIPImpl.set.bind(this));
-	this.on('load', 1, RIPImpl.load.bind(this));
-	this.on('disconnect', 0, RIPImpl.disconnect.bind(this));
-	this.hardwareInterface = HardwareInterfaceFactory.makeArduinoInterface();
+  this.on('connect', { 
+    'purpose': 'To establish a connection with the lab.',
+    'params': {},
+  }, RIPImpl.connect.bind(this));
+  this.on('info', {
+    'purpose': 'To get server metadata',
+    'params': {},
+  }, RIPImpl.info.bind(this));
+  this.on('set', {
+    'purpose': 'To write a server variable',
+    'params': {'variables': '[string]', 'values': '[]',},
+  }, RIPImpl.set.bind(this));
+  this.on('get', {
+    'purpose': 'To read a server variable',
+    'params': {'variables': '[string]',},
+  }, RIPImpl.get.bind(this));
+	this.on('disconnect', {
+    'purpose': 'To finish the connection with the lab.',
+    'params': {},
+	}, RIPImpl.disconnect.bind(this));
+	this.on('load', {
+    'purpose': 'To finish the connection with the lab.',
+    'params': {'code':'string'},	
+	}, RIPImpl.load.bind(this));
 }
 
 RIPImpl.connect = function() {
@@ -40,30 +57,7 @@ RIPImpl.connect = function() {
   	  name: 'Air Levitator System Lab',
   	  description: 'Air Levitator System Lab',
 	  },
-		methods: {
-		  'connect': {
-		    'purpose': 'To establish a connection with the lab.',
-        'params': {},
-		  },
-		  'set': {
-		    'purpose': 'To write a server variable',
-        'params': {
-            'variables': '[string]',
-            'values': '[]',
-		    },
- 		  },
-		  'get': {
-		    'purpose': 'To read a server variable',
-        'params': {
-            'variables': '[string]',
-            'values': '[]',
-		    },
-		  },
-		  'disconnect': {
-		    'purpose': 'To finish the connection with the lab.',
-		    'params': {},
-		  },
-		},
+		methods: this.getMethods(),
 		readable: this.hardwareInterface.getReadableVariables(),
 		writable: this.hardwareInterface.getWritableVariables(),
 	};

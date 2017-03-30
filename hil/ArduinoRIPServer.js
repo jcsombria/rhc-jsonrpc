@@ -63,7 +63,7 @@ ArduinoRipServer.connect = function() {
 		  },
 		  'disconnect': {
 		    'purpose': 'To finish the connection with the lab.',
-		    'params': '',
+		    'params': {},
 		  },
 		},
 		readable: this.hardwareInterface.getReadableVariables(),

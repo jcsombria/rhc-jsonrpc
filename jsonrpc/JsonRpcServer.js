@@ -91,9 +91,28 @@ JsonRpcServer.prototype.process = function(request) {
 	return result;
 };
 
-JsonRpcServer.prototype.on = function(method, nparams, handler) {		
-	this.methods[method] = {nparams: nparams, handler: handler};
+JsonRpcServer.prototype.on = function(method, info, handler) {
+  var nparams = 0;
+  try {
+    if(typeof info == 'number') {
+      nparams = info;
+    } else if(info.params != undefined) {
+      for(var param in info.params) nparams ++;
+    };
+    
+  } catch(error) {
+    console.log(error);
+  }
+	this.methods[method] = {nparams: nparams, handler: handler, info: info};
 };
+
+JsonRpcServer.prototype.getMethods = function() {
+  var methods = {}
+  for(var method in this.methods) {
+    methods[method] = this.methods[method].info;
+  }
+  return methods;
+}
 
 JsonRpcServer.prototype.responseWithError = function(id, code, message, data) {
 	return {

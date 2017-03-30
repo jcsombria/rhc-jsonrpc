@@ -22,16 +22,31 @@ var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
 var DummyServer = new JsonRpcServer();
 
 DummyServer.init = function() {
-	this.on('connect', 0, DummyServer.connect.bind(this));
-	this.on('disconnect', 0, DummyServer.disconnect.bind(this));
-	this.on('open', 0, DummyServer.open.bind(this));
-	this.on('close', 0, DummyServer.stop.bind(this));
-	this.on('run', 0, DummyServer.run.bind(this));
-	this.on('stop', 0, DummyServer.stop.bind(this));
-	this.on('get', 2, DummyServer.get.bind(this));
-	this.on('set', 1, DummyServer.set.bind(this));
-	this.on('getValue', 1, DummyServer.getValue.bind(this));
-	this.on('setValue', 2, DummyServer.setValue.bind(this));
+  this.on('connect', { 
+    'purpose': 'To establish a connection with the lab.',
+    'params': {},
+  }, DummyServer.connect.bind(this));
+  this.on('info', {
+    'purpose': 'To get server metadata',
+    'params': {},
+  }, DummyServer.info.bind(this));
+  this.on('set', {
+    'purpose': 'To write a server variable',
+    'params': {
+      'variables': '[string]',
+      'values': '[]',
+    },  
+  }, DummyServer.setValue.bind(this));
+  this.on('get', {
+    'purpose': 'To read a server variable',
+    'params': {
+      'variables': '[string]',
+    },
+  }, DummyServer.getValue.bind(this));
+	this.on('disconnect', {
+    'purpose': 'To finish the connection with the lab.',
+    'params': {},
+	}, DummyServer.disconnect.bind(this));
 }
 
 DummyServer.setHardwareInterface = function(hardwareInterface) {
@@ -39,40 +54,10 @@ DummyServer.setHardwareInterface = function(hardwareInterface) {
 }
 
 DummyServer.connect = function() {
-//	return {'session-id': UUID()};
-  return {
-    info: {
-  	  name: 'Air Levitator System Lab',
-  	  description: 'Air Levitator System Lab',
-	  },
-    methods: {
-		  'connect': {
-		    'purpose': 'To establish a connection with the lab.',
-        'params': {}
-		  },
-		  'set': {
-		    'purpose': 'To write a server variable',
-        'params': {
-            'variables': '[string]',
-            'values': '[]',
-		    },
- 		  },
-		  'get': {
-		    'purpose': 'To read a server variable',
-        'params': {
-            'variables': '[string]',
-            'values': '[]',
-		    },
-		  },
-		  'disconnect': {
-		    'purpose': 'To finish the connection with the lab.',
-		    'params': {},
-		  },
-		},
-    readable: this.hardwareInterface.getReadableVariables(),
-		writable: this.hardwareInterface.getWritableVariables(),
+	return {
+	  'session-id': UUID(),
 	};
-}
+};
 
 function UUID() {
     var d = new Date().getTime();
@@ -84,48 +69,59 @@ function UUID() {
     return uuid;
 };
 
-DummyServer.setTransport = function(transport) {
-  this.transport = transport;
+DummyServer.metodoInventado = function() {
+  return 'Hola';
 }
 
-DummyServer.open = function() {
-return {
-	  info: {
+DummyServer.info = function() { 
+  return {
+    info: {
   	  name: 'Air Levitator System Lab',
   	  description: 'Air Levitator System Lab',
 	  },
-//methods: ['connect', 'disconnect', 'open', 'close', 'run', 'stop', 'get', 'set', 'getValue', 'setValue'],
-		methods: {
-		  'connect': {
-		    'purpose': 'To establish a connection with the lab.',
-        'params': {},
-		  },
-		  'set': {
-		    'purpose': 'To write a server variable',
-        'params': {
-            'variables': '[string]',
-            'values': '[]',
-		    },
- 		  },
-		  'get': {
-		    'purpose': 'To read a server variable',
-        'params': {
-            'variables': '[string]',
-            'values': '[]',
-		    },
-		  },
-		  'disconnect': {
-		    'purpose': 'To finish the connection with the lab.',
-		    'params': '',
-		  },
-		},
-		readable: this.hardwareInterface.getReadableVariables(),
+    methods: this.getMethods(),
+    readable: this.hardwareInterface.getReadableVariables(),
 		writable: this.hardwareInterface.getWritableVariables(),
 	};
 }
 
+DummyServer.setTransport = function(transport) {
+  this.transport = transport;
+}
+
 DummyServer.run = function() {
 	return {'state':'running'};
+}
+
+DummyServer.getValue = function(params) {
+	var variable = [params[0]];
+	var result = {};
+	var value = this.hardwareInterface.read(variable);	
+	result[variable] = value;
+	console.log(result);
+	return result;
+}
+
+DummyServer.setValue = function(params) {
+	var variable = params[0];
+	var value = params[1];
+	this.hardwareInterface.write(variable, value);
+	var result = {};
+	result[variable] = value;
+	console.log(result);
+	return result;
+}
+
+DummyServer.close = function() {
+	return {close:'not implemented'};
+}
+
+DummyServer.stop = function() {
+	return {stop:'not implemented'};
+}
+
+DummyServer.disconnect = function() {
+	return {disconnect:'not implemented'};
 }
 
 DummyServer.get = function(params) {
@@ -139,7 +135,6 @@ DummyServer.get = function(params) {
 	  var result = this.get(params);
 	  this.transport.send(JSON.stringify(result));
 	}.bind(this), 1000);
-	  
 	return result;
 }
 
@@ -159,34 +154,6 @@ DummyServer.set = function(params) {
 	return result;
 }
 
-DummyServer.getValue = function(params) {
-	var variable = [params[0]];
-	var result = {};
-	var value = this.hardwareInterface.read(variable);	
-	result[variable] = value;
-	return result;
-}
-
-DummyServer.setValue = function(params) {
-	var variable = params[0];
-	var value = params[1];
-	this.hardwareInterface.write(variable, value);
-	var result = {};
-	result[variable] = value;
-	return result;
-}
-
-DummyServer.close = function() {
-	return {close:'not implemented'};
-}
-
-DummyServer.stop = function() {
-	return {stop:'not implemented'};
-}
-
-DummyServer.disconnect = function() {
-	return {disconnect:'not implemented'};
-}
 
 DummyServer.init();
 module.exports = DummyServer;

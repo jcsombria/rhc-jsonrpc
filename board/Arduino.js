@@ -55,9 +55,8 @@ Arduino.prototype._onData = function(data) {
     this.lastRead = JSON.parse(data);
     this.lastRead.timestamp += this.startTime;
     for(var listener in this.listeners) {
-      console.log(listener);
+      listener(data);
     }
-    //console.log(this.lastRead);
     if(this.datalogger != undefined) {
       this.datalogger.log(this.lastRead);
     }
