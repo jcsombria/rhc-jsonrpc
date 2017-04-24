@@ -22,7 +22,7 @@ var WebSocketServer = require('ws').Server
    , http = require('http')
    , express = require('express')
    , app = express()
-var rpcserver = require('./hil/DummyServer');
+var rpcserver = require('./hil/HILRemoteServer');
 
 app.use(express.static(__dirname + '/public'));
 

@@ -19,49 +19,151 @@
  */
 
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
-var HardwareInterfaceFactory = require('../app/HardwareInterfaceFactory');
-var RIPImpl = new JsonRpcServer();
+var DummyServer = new JsonRpcServer();
 
-RIPImpl.hardwareInterface = HardwareInterfaceFactory.makeTestHardwareInterface();
-
-RIPImpl.init = function() {
-	this.on('connect', 0, RIPImpl.connect.bind(this));
-	this.on('getMetadata', 0, RIPImpl.getMetadata.bind(this));
-	this.on('get', 1, RIPImpl.get.bind(this));
-	this.on('set', 2, RIPImpl.set.bind(this));
-	this.on('disconnect', 0, RIPImpl.disconnect.bind(this));
+DummyServer.init = function() {
+  this.on('connect', { 
+    'purpose': 'To establish a connection with the lab.',
+    'params': {},
+  }, DummyServer.connect.bind(this));
+  this.on('info', {
+    'purpose': 'To get server metadata',
+    'params': {},
+  }, DummyServer.info.bind(this));
+  this.on('set', { 
+    'purpose': 'To write a server variable',
+    'params': {
+      'variables': '[string]',
+      'values': '[]',
+    },  
+  }, DummyServer.setValue.bind(this));
+  this.on('get', {
+    'purpose': 'To read a server variable',
+    'params': {
+      'variables': '[string]',
+    },
+  }, DummyServer.getValue.bind(this));
+	this.on('disconnect', {
+    'purpose': 'To finish the connection with the lab.',
+    'params': {},
+	}, DummyServer.disconnect.bind(this));
 }
 
-RIPImpl.connect = function() {
-  return true;
+DummyServer.setHardwareInterface = function(hardwareInterface) {
+  this.hardwareInterface = hardwareInterface;
 }
 
-RIPImpl.getMetadata = function() {
-	var meta= {
-		methods: ['connect', 'set', 'get', 'disconnect'],
-		readable: this.hardwareInterface.getReadableVariables(),
+DummyServer.connect = function() {
+	return {
+	  'session-id': UUID(),
+	};
+};
+
+function UUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+};
+
+DummyServer.metodoInventado = function() {
+  return 'Hola';
+}
+
+DummyServer.info = function() { 
+	console.log({
+		info: {
+			name: 'Air Levitator System Lab',
+	  		description: 'Air Levitator System Lab',
+		},
+		methods: this.getMethods(),
+  	readable: this.hardwareInterface.getReadableVariables(),
+		writable: this.hardwareInterface.getWritableVariables(),
+	});
+
+  return {
+    info: {
+  	  name: 'Air Levitator System Lab',
+  	  description: 'Air Levitator System Lab',
+	  },
+    methods: this.getMethods(),
+    readable: this.hardwareInterface.getReadableVariables(),
 		writable: this.hardwareInterface.getWritableVariables(),
 	};
-	return meta;
 }
-	
-RIPImpl.get = function(variables) {
-	result = [];
-	for (var i=0; i<variables.length; i++) {
-		result.push(this.hardwareInterface.read(variables[i]));
+
+DummyServer.setTransport = function(transport) {
+  this.transport = transport;
+}
+
+DummyServer.run = function() {
+	return {'state':'running'};
+}
+
+DummyServer.getValue = function(params) {
+	var variable = [params[0]];
+	var result = {};
+	var value = this.hardwareInterface.read(variable);	
+	result[variable] = value;
+	console.log(result);
+	return result;
+}
+
+DummyServer.setValue = function(params) {
+	var variable = params[0];
+	var value = params[1];
+	this.hardwareInterface.write(variable, value);
+	var result = {};
+	result[variable] = value;
+	console.log(result);
+	return result;
+}
+
+DummyServer.close = function() {
+	return {close:'not implemented'};
+}
+
+DummyServer.stop = function() {
+	return {stop:'not implemented'};
+}
+
+DummyServer.disconnect = function() {
+	return {disconnect:'not implemented'};
+}
+
+DummyServer.get = function(params) {
+	var variables = [params[0]];
+	var condition = [params[1]];
+	var result = {};
+	for (i=0; i<variables.length; i++) { 
+	  result[variables[i]] = this.hardwareInterface.read(variables[i]);
+	}
+	setTimeout(function(){
+	  var result = this.get(params);
+	  this.transport.send(JSON.stringify(result));
+	}.bind(this), 1000);
+	return result;
+}
+
+DummyServer._notify = function(result) {
+  this.transport.send(result);
+}
+
+DummyServer.set = function(params) {
+	var variables = params;
+	var result = {};
+	for(item in variables) {
+	  name = item;
+	  value = variables[item];
+	  result[item] = value;
+	  this.hardwareInterface.write(name, value);
 	}
 	return result;
 }
 
-RIPImpl.set = function(variables, values) {
-	for(var i=0; i<variables.length; i++) {
-		this.hardwareInterface.write(variables[i], values[i]);
-	}
-}
 
-RIPImpl.disconnect = function() {
-	return true;
-}
-
-RIPImpl.init();
-module.exports = RIPImpl;
+DummyServer.init();
+module.exports = DummyServer;

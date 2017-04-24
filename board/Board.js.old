@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 const ioType = {
-  ANALOG:"analog", 
+	ANALOG:"analog", 
 	DIGITAL:"digital"
 };
 
@@ -74,8 +75,8 @@ GenericBoard.prototype.read = function(pin) {
 }
 
 GenericBoard.prototype.isReadable = function(pin) {
-  return this.hwio[pin] != undefined && (this.hwio[pin].dir == ioDir.IN
-      || this.hwio[pin].dir == ioDir.IN_OUT);
+  return this.hwio[pin].dir == ioDir.OUT
+      || this.hwio[pin].dir == ioDir.IN_OUT;
 }
 
 GenericBoard.prototype.write = function(pin, value) {
@@ -85,8 +86,8 @@ GenericBoard.prototype.write = function(pin, value) {
 }
 
 GenericBoard.prototype.isWritable = function(pin) {
-  return (this.hwio[pin] != undefined) && (this.hwio[pin].dir == ioDir.OUT
-      || this.hwio[pin].dir == ioDir.IN_OUT);
+  return this.hwio[pin].dir == ioDir.IN
+      || this.hwio[pin].dir == ioDir.IN_OUT;
 }
 
 GenericBoard.prototype.pinRange = function(pin) {
@@ -133,5 +134,5 @@ TestBoard.prototype = GenericBoard.prototype;
 // Module Exports
 module.exports.ioDir = ioDir;
 module.exports.ioType = ioType;
-module.exports.GenericBoard = GenericBoard;
+module.exports.Board = GenericBoard;
 module.exports.TestBoard = new TestBoard();

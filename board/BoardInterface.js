@@ -132,4 +132,16 @@ BoardInterface.prototype.getWritableVariables = function() {
 	return listOfOutputVariables;
 }
 
+BoardInterface.prototype.addListener = function(listener) {
+	this.board.addListener(listener);
+}
+
+BoardInterface.prototype.connect = function(callback) {
+	this.board.connect(callback);
+}
+
+BoardInterface.prototype.disconnect = function(callback) {
+	this.board.disconnect(callback);
+}
+
 module.exports = BoardInterface;
