@@ -39,8 +39,20 @@ var App = {
  			{ 'name': 'A3', 'pin': 'A3', 'type': 'in' },
 			{ 'name': 'A4', 'pin': 'A4', 'type': 'in' },
 			{ 'name': 'A5', 'pin': 'A5', 'type': 'in' },
-			{ 'name': 'stepper_dir', 'pin': 'D2', 'type': 'out' },
-			{ 'name': 'stepper_step', 'pin': 'D3', 'type': 'out' },
+			{ 'name': 'D0', 'pin': 'D0', 'type': 'out' },
+			{ 'name': 'D1', 'pin': 'D1', 'type': 'out' },
+			{ 'name': 'D2', 'pin': 'D2', 'type': 'out' },
+			{ 'name': 'D3', 'pin': 'D3', 'type': 'out' },
+			{ 'name': 'D4', 'pin': 'D4', 'type': 'out' },
+			{ 'name': 'D5', 'pin': 'D5', 'type': 'out' },
+			{ 'name': 'D6', 'pin': 'D6', 'type': 'out' },
+			{ 'name': 'D7', 'pin': 'D7', 'type': 'out' },
+			{ 'name': 'D8', 'pin': 'D8', 'type': 'out' },
+			{ 'name': 'D9', 'pin': 'D9', 'type': 'out' },
+			{ 'name': 'D10', 'pin': 'D10', 'type': 'out' },
+			{ 'name': 'D11', 'pin': 'D11', 'type': 'out' },
+			{ 'name': 'D12', 'pin': 'D12', 'type': 'out' },
+			{ 'name': 'D13', 'pin': 'D13', 'type': 'out' },
 		];
     for(var i=0; i<variables.length; i++) {
 			var variable = variables[i];
