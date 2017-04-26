@@ -69,10 +69,6 @@ var App = {
 					break;
 			}
 		}
-		for(variable in variables) {
-			var pin = variables[variable];
-			this.arduino.addVariable(variable, pin);
-		}
 	},
 	
 	startServer: function() {

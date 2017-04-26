@@ -46,10 +46,6 @@ var App = {
 					break;
 			}
 		}
-		for(variable in variables) {
-			var pin = variables[variable];
-			testHardwareInterface.addVariable(variable, pin);
-		}
     rpcserver.setHardwareInterface(testHardwareInterface);
 		this.httpserver = new HttpServer();
 		this.httpserver.setRPCServer(rpcserver);
