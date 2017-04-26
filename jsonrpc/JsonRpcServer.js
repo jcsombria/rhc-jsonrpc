@@ -54,18 +54,17 @@ JsonRpcServer.prototype.parse = function(jsonrpc) {
     return this.responseWithError(null, error.code, error.message);
   }
 	var isBatchMode = (methodCall instanceof Array);
-	var result;
+	var response;
 	if(isBatchMode) {
-		result = [];
-		for(var currentRequest=0, currentResponse=0, len=methodCall.length; currentRequest<len; currentRequest++) {
-			result[currentResponse] = this.process(methodCall[currentRequest]);
-			var isEmpty = result[currentRequest]
-			if(!isEmpty) currentRequest++;
+		response = [];
+		for(var i=0, len=methodCall.length; i<len; i++) {
+			var result = this.process(methodCall[i]); 
+			response.push(result);
 		}	
 	} else {
-		result = this.process(methodCall);
+		response = this.process(methodCall);
 	}
-	return result;
+	return response;
 }
 
 JsonRpcServer.prototype.process = function(request) {

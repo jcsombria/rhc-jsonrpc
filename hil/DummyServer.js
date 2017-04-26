@@ -36,13 +36,13 @@ DummyServer.init = function() {
       'variables': '[string]',
       'values': '[]',
     },  
-  }, DummyServer.setValue.bind(this));
+  }, DummyServer.set.bind(this));
   this.on('get', {
     'purpose': 'To read a server variable',
     'params': {
       'variables': '[string]',
     },
-  }, DummyServer.getValue.bind(this));
+  }, DummyServer.get.bind(this));
 	this.on('disconnect', {
     'purpose': 'To finish the connection with the lab.',
     'params': {},
@@ -69,25 +69,11 @@ function UUID() {
     return uuid;
 };
 
-DummyServer.metodoInventado = function() {
-  return 'Hola';
-}
-
-DummyServer.info = function() { 
-	console.log({
-		info: {
-			name: 'Air Levitator System Lab',
-	  		description: 'Air Levitator System Lab',
-		},
-		methods: this.getMethods(),
-  	readable: this.hardwareInterface.getReadableVariables(),
-		writable: this.hardwareInterface.getWritableVariables(),
-	});
-
+DummyServer.info = function() {
   return {
     info: {
-  	  name: 'Air Levitator System Lab',
-  	  description: 'Air Levitator System Lab',
+  	  name: 'RIP Test Server',
+  	  description: 'A minimal implementation of the RIP protocol, to be used for tests and as example.',
 	  },
     methods: this.getMethods(),
     readable: this.hardwareInterface.getReadableVariables(),
@@ -95,75 +81,29 @@ DummyServer.info = function() {
 	};
 }
 
-DummyServer.setTransport = function(transport) {
-  this.transport = transport;
-}
-
-DummyServer.run = function() {
-	return {'state':'running'};
-}
-
-DummyServer.getValue = function(params) {
-	var variable = [params[0]];
-	var result = {};
-	var value = this.hardwareInterface.read(variable);	
-	result[variable] = value;
-	console.log(result);
+DummyServer.get = function(variables) {
+	var result = [];
+	for (i=0; i<variables.length; i++) {
+	  result[i] = this.hardwareInterface.read(variables[i]);
+	}
 	return result;
 }
 
-DummyServer.setValue = function(params) {
-	var variable = params[0];
-	var value = params[1];
-	this.hardwareInterface.write(variable, value);
-	var result = {};
-	result[variable] = value;
-	console.log(result);
+DummyServer.set = function(variables, values) {
+	var result = [];
+	for (i=0; i<variables.length; i++) {
+	  var variable = variables[i];
+	  var value = values[i];
+	  this.hardwareInterface.write(variable, value);
+	}
 	return result;
-}
-
-DummyServer.close = function() {
-	return {close:'not implemented'};
-}
-
-DummyServer.stop = function() {
-	return {stop:'not implemented'};
 }
 
 DummyServer.disconnect = function() {
-	return {disconnect:'not implemented'};
+	return {
+		disconnect:'not implemented',
+	};
 }
-
-DummyServer.get = function(params) {
-	var variables = [params[0]];
-	var condition = [params[1]];
-	var result = {};
-	for (i=0; i<variables.length; i++) { 
-	  result[variables[i]] = this.hardwareInterface.read(variables[i]);
-	}
-	setTimeout(function(){
-	  var result = this.get(params);
-	  this.transport.send(JSON.stringify(result));
-	}.bind(this), 1000);
-	return result;
-}
-
-DummyServer._notify = function(result) {
-  this.transport.send(result);
-}
-
-DummyServer.set = function(params) {
-	var variables = params;
-	var result = {};
-	for(item in variables) {
-	  name = item;
-	  value = variables[item];
-	  result[item] = value;
-	  this.hardwareInterface.write(name, value);
-	}
-	return result;
-}
-
 
 DummyServer.init();
 module.exports = DummyServer;

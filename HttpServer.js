@@ -53,7 +53,10 @@ HttpServer.prototype._onRequest = function(request, response) {
   request.on('end', function () {
     if(this.rpcserver != undefined) {
       response.writeHead(200, headers);
-      response.write(JSON.stringify(this.rpcserver.parse(body)));
+			var content = JSON.stringify(this.rpcserver.parse(body));
+			console.log('request:\n\t' + body);
+			console.log('response:\n\t' + content);
+      response.write(content);
       response.end();
     }
   }.bind(this));
