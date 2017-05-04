@@ -20,7 +20,7 @@
 var BeagleBoneBlack = require('../board/BeagleBoneBlackBoard');
 var BoardInterface = require('../board/BoardInterface');
 var HttpServer = require('../HttpServer');
-var rpcserver = require('../hil/HILRemoteServer');
+var rpcserver = require('../rip/HILRemoteServer');
 
 var App = {
 	start: function() {

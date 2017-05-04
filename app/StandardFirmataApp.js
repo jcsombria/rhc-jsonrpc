@@ -20,7 +20,7 @@
 var BoardInterface = require('../board/BoardInterface');
 var HttpServer = require('../HttpServer');
 var Arduino = require('../board/SFArduino');
-var rpcserver = require('../hil/SFArduinoRIPServer');
+var rpcserver = require('../rip/SFArduinoRIPServer');
 
 var App = {
 	start: function() {

@@ -20,7 +20,7 @@
 var BoardInterface = require('../board/BoardInterface');
 var Board = require('../board/Boards');
 var HttpServer = require('../HttpServer');
-var rpcserver = require('../hil/DummyServer');
+var rpcserver = require('../rip/DummyServer');
 
 var App = {
 	start: function() {
