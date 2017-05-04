@@ -59,8 +59,8 @@ ArduinoRipServer.connect = function() {
 ArduinoRipServer.info = function() {
 	return {
 	  info: {
-  	  name: 'Arduino Standard Firmata',
-  	  description: 'Arduino Standard Firmata',
+  	  name: 'RIP - Arduino Standard Firmata',
+  	  description: 'RIP interface to access Arduino Standard Firmata',
 	  },
 	  methods: this.getMethods(),
 		readable: this.hardwareInterface.getReadableVariables(),

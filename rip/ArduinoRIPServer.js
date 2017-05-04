@@ -25,33 +25,37 @@ var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
 var ArduinoRIPServer = new JsonRpcServer();
 
 ArduinoRIPServer.init = function() {
-  this.on('connect', { 
-    'purpose': 'To establish a connection with the lab.',
-    'params': {},
-  }, ArduinoRIPServer.connect.bind(this));
-  this.on('info', {
-    'purpose': 'To get server metadata',
-    'params': {},
-  }, ArduinoRIPServer.info.bind(this));
-  this.on('set', {
-    'purpose': 'To write a server variable',
-    'params': {
-      'variables': '[string]',
-      'values': '[]',
-    },  
-  }, ArduinoRIPServer.set.bind(this));
-  this.on('get', {
-    'purpose': 'To read a server variable',
-    'params': {
-      'variables': '[string]',
-    },
-  }, DummyServer.get.bind(this));
+	this.on('connect', { 
+		'purpose': 'To establish a connection with the lab.',
+		'params': {},
+	}, ArduinoRIPServer.connect.bind(this));
+	this.on('info', {
+		'purpose': 'To get server metadata',
+		'params': {},
+	}, ArduinoRIPServer.info.bind(this));
+	this.on('set', {
+		'purpose': 'To write a server variable',
+		'params': {
+			'variables': '[string]',
+			'values': '[]',
+		},
+	}, ArduinoRIPServer.set.bind(this));
+	this.on('get', {
+		'purpose': 'To read a server variable',
+		'params': {
+			'variables': '[string]',
+		},
+	}, ArduinoRIPServer.get.bind(this));
 	this.on('disconnect', {
-    'purpose': 'To finish the connection with the lab.',
-    'params': {},
+		'purpose': 'To finish the connection with the lab.',
+		'params': {},
 	}, ArduinoRIPServer.disconnect.bind(this));
-
-	this.on('load', 1, ArduinoRIPServer.load.bind(this));
+	this.on('load', {
+		'purpose': 'To upload arduino code',
+		'params': {
+			'code': 'string',
+		},
+	}, ArduinoRIPServer.load.bind(this));
 }
 
 ArduinoRIPServer.setHardwareInterface = function(hardwareInterface) {
@@ -59,6 +63,20 @@ ArduinoRIPServer.setHardwareInterface = function(hardwareInterface) {
 }
 
 ArduinoRIPServer.connect = function() {
+	return { 'session-id': 'AirLevitator'};
+}
+
+ArduinoRIPServer.info = function() {
+	console.log({
+		info: {
+			name: 'Air Levitator System Lab',
+	  		description: 'Air Levitator System Lab',
+		},
+		methods: this.getMethods(),
+  	readable: this.hardwareInterface.getReadableVariables(),
+		writable: this.hardwareInterface.getWritableVariables(),
+	});
+
 	return {
 		info: {
 			name: 'Air Levitator System Lab',
