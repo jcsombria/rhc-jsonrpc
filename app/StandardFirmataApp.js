@@ -17,22 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var BoardInterface = require('../board/BoardInterface');
-var HttpServer = require('../HttpServer');
-var Arduino = require('../board/SFArduino');
-var rpcserver = require('../rip/SFArduinoRIPServer');
-
-var App = {
-	start: function() {
-		this.arduino = new BoardInterface(Arduino);
-		this.arduino.connect(function onConnect() {
-      this.initVariables();
-      this.startServer();
-		}.bind(this));
+var conf = {
+	server: {
+		rip: 'SFArduinoRIPServer',
+		transport: 'HttpServer',
 	},
-  
-  initVariables: function() {
-	    var variables = [
+	board: {
+		require: 'SFArduino',
+		name: 'StandardFirmataArduino',
+		variables: [
 			{ 'name': 'A0', 'pin': 'A0', 'type': 'in' },
 			{ 'name': 'A1', 'pin': 'A1', 'type': 'in' },
 			{ 'name': 'A2', 'pin': 'A2', 'type': 'in' },
@@ -53,30 +46,16 @@ var App = {
 			{ 'name': 'D11', 'pin': 'D11', 'type': 'out' },
 			{ 'name': 'D12', 'pin': 'D12', 'type': 'out' },
 			{ 'name': 'D13', 'pin': 'D13', 'type': 'out' },
-		];
-    for(var i=0; i<variables.length; i++) {
-			var variable = variables[i];
-			this.arduino.addVariable(variable['name'], variable['pin']);
-			switch(variable['type']) {
-				case 'in':
-					this.arduino.setReadable(variable['name']);
-					break;
-				case 'in_out':
-					this.arduino.setReadableWritable(variable['name']);
-					break;
-				case 'out':
-					this.arduino.setWritable(variable['name']);
-					break;
-			}
-		}
+		],
 	},
-	
-	startServer: function() {
-    rpcserver.setHardwareInterface(this.arduino);
-		this.httpserver = new HttpServer();
-		this.httpserver.setRPCServer(rpcserver);
-		this.httpserver.start();	
-	}
+}
+
+var App = require('./GenericApp');
+App.init(conf);
+App.start = function() {
+		this.boardInterface.connect(function onConnect() {
+      this._start();
+		}.bind(this));
 }
 
 App.start();

@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-var BoardInterface = require('../board/BoardInterface');
-var Arduino = require('../board/Arduino');
-var HttpServer = require('../HttpServer');
-var rpcserver = require('../rip/ArduinoRIPServer');
 		
-var App = {
-	start: function() {
-		var arduinoInterface = new BoardInterface(Arduino);
-		var variables = [
+var conf = {
+	server: {
+		rip: 'ArduinoRIPServer',
+		transport: 'HttpServer',
+	},
+	board: {
+		require: 'Arduino',
+		name: 'Arduino',
+		variables: [
 			{ 'name': 'ball_height', 'pin': 'ball_height', 'type': 'in' },
 			{ 'name': 'fan_control', 'pin': 'fan_control', 'type': 'out' },
 			{ 'name': 'servo', 'pin': 'servo', 'type': 'out' },
@@ -37,27 +37,10 @@ var App = {
 			{ 'name': 'mode', 'pin':'mode', 'type': 'in_out' },
 			{ 'name': 'fan_min', 'pin':'fan_min', 'type': 'in_out' },
 			{ 'name': 'fan_max', 'pin':'fan_max', 'type': 'in_out' },
-		];
-		for(var i=0; i<variables.length; i++) {
-			var variable = variables[i];
-			arduinoInterface.addVariable(variable['name'], variable['pin']);
-			switch(variable['type']) {
-				case 'in':
-					arduinoInterface.setReadable(variable['name']);
-					break;
-				case 'in_out':
-					arduinoInterface.setReadableWritable(variable['name']);
-					break;
-				case 'out':
-					arduinoInterface.setWritable(variable['name']);
-					break;
-			}
-		}
-	    rpcserver.setHardwareInterface(arduinoInterface);
-		this.httpserver = new HttpServer();
-		this.httpserver.setRPCServer(rpcserver);
-		this.httpserver.start();
-	}
+		],
+	},
 }
 
+var App = require('./GenericApp');
+App.init(conf);
 App.start();

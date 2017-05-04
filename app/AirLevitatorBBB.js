@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var BeagleBoneBlack = require('../board/BeagleBoneBlackBoard');
-var BoardInterface = require('../board/BoardInterface');
-var HttpServer = require('../HttpServer');
-var rpcserver = require('../rip/HILRemoteServer');
-
-var App = {
-	start: function() {
-		beagleBoneBlackInterface = new BoardInterface(BeagleBoneBlack);
-		var variables = [
+var conf = {
+	server: {
+		rip: 'HILRemoteServer',
+		transport: 'HttpServer',
+	},
+	board: {
+		require: 'BeagleBoneBlackBoard',
+		name: 'BeagleBoneBlack',
+		variables: [
 			{ 'name': 'ball_height', 'pin': 'P9_36', 'type': 'in' },
 			{ 'name': 'fan_control', 'pin': 'P9_14', 'type': 'out' },
 			{ 'name': 'servo_control', 'pin': 'P9_22', 'type': 'out' },
@@ -33,33 +33,10 @@ var App = {
 			{ 'name': 'kp', 'type': 'in_out' },
 			{ 'name': 'ki', 'type': 'in_out' },
 			{ 'name': 'kd', 'type': 'in_out' },
-		];
-		for(var i=0; i<variables.length; i++) {
-			var variable = variables[i];
-			beagleBoneBlackInterface.addVariable(variable['name'], variable['pin']);
-			switch(variable['type']) {
-				case 'in':
-					beagleBoneBlackInterface.setReadable(variable['name']);
-					break;
-				case 'in_out':
-					beagleBoneBlackInterface.setReadableWritable(variable['name']);
-					break;
-				case 'out':
-					beagleBoneBlackInterface.setWritable(variable['name']);
-					break;
-			}
-		}
-		beagleBoneBlackInterface.write('setpoint', 10);
-		beagleBoneBlackInterface.write('kp', 0.6);
-		beagleBoneBlackInterface.write('ki', 0.005);
-		beagleBoneBlackInterface.write('kd', 0.5);
-		beagleBoneBlackInterface.write('servo_control', 0.2);
-    
-    rpcserver.setHardwareInterface(beagleBoneBlackInterface);
-		this.httpserver = new HttpServer();
-		this.httpserver.setRPCServer(rpcserver);
-		this.httpserver.start();		
+		],
 	},
 }
 
+var App = require('./GenericApp');
+App.init(conf);
 App.start();

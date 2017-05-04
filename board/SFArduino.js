@@ -80,4 +80,4 @@ Arduino.prototype.setOutputMode = function(pin) {
   }
 }
 
-module.exports = new Arduino();
+module.exports.StandardFirmataArduino = new Arduino();

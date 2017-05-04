@@ -84,4 +84,4 @@ Arduino.prototype.write = function(variable, value) {
   }
 };
 
-module.exports = new Arduino();
+module.exports.Arduino = new Arduino();
