@@ -64,9 +64,9 @@ var App = {
 			console.log('[WARNING] Cannot set Board implementation. Using TestBoard.');
 			this.Boards = require('../board/Boards');
 			this.boardInterface = new BoardInterface(this.Boards.TestBoard);
-			this.bindVariables(board.variables);
 		}
-	    this.rip.setHardwareInterface(this.boardInterface);
+		this.bindVariables(board.variables);
+		this.rip.setHardwareInterface(this.boardInterface);
 	},
 
 	bindVariables: function(variables) {
