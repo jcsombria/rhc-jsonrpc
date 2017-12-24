@@ -16,29 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-		
+
 var conf = {
-	server: {
-		rip: 'ArduinoRIPServer',
-		transport: 'HttpServer',
-	},
-	board: {
-		require: 'Arduino',
-		name: 'Arduino',
-		variables: [
-			{ 'name': 'ball_height', 'pin': 'ball_height', 'type': 'in' },
-			{ 'name': 'fan_control', 'pin': 'fan_control', 'type': 'out' },
-			{ 'name': 'servo', 'pin': 'servo', 'type': 'out' },
-			{ 'name': 'setpoint', 'pin': 'setpoint', 'type': 'in_out' },
-			{ 'name': 'kp', 'pin':'kp', 'type': 'in_out' },
-			{ 'name': 'ki', 'pin':'ki', 'type': 'in_out' },
-			{ 'name': 'kd', 'pin':'kd', 'type': 'in_out' },
-			{ 'name': 'u', 'pin':'u', 'type': 'in_out' },
-			{ 'name': 'mode', 'pin':'mode', 'type': 'in_out' },
-			{ 'name': 'fan_min', 'pin':'fan_min', 'type': 'in_out' },
-			{ 'name': 'fan_max', 'pin':'fan_max', 'type': 'in_out' },
-		],
-	},
+  server: {
+    rip: 'ArduinoRIPServer',
+    transport: 'HttpServer',
+    info: {
+      name: 'Air Levitator System Lab',
+      description: 'Air Levitator System Lab - Arduino',
+    },
+  },
+  board: {
+    require: 'Arduino',
+    name: 'Arduino',
+    variables: [
+      { 'name': 'ball_height', 'pin': 'ball_height', 'type': 'in' },
+      { 'name': 'fan_control', 'pin': 'fan_control', 'type': 'out' },
+      { 'name': 'servo', 'pin': 'servo', 'type': 'out' },
+      { 'name': 'setpoint', 'pin': 'setpoint', 'type': 'in_out' },
+      { 'name': 'kp', 'pin':'kp', 'type': 'in_out' },
+      { 'name': 'ki', 'pin':'ki', 'type': 'in_out' },
+      { 'name': 'kd', 'pin':'kd', 'type': 'in_out' },
+      { 'name': 'u', 'pin':'u', 'type': 'in_out' },
+      { 'name': 'mode', 'pin':'mode', 'type': 'in_out' },
+      { 'name': 'fan_min', 'pin':'fan_min', 'type': 'in_out' },
+      { 'name': 'fan_max', 'pin':'fan_max', 'type': 'in_out' },
+    ],
+  },
 }
 
 var App = require('./GenericApp');

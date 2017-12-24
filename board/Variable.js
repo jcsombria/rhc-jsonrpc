@@ -17,64 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 function Variable(name) {
-	this.name = name;
-	this.pin = undefined;
-	this.value = 0;
-	this.minimum = -Infinity;
-	this.maximum = Infinity;
-	this.readable = false;
-	this.writable = false;
+  this.name = name;
+  this.pin = undefined;
+  this.value = 0;
+  this.minimum = -Infinity;
+  this.maximum = Infinity;
+  this.readable = false;
+  this.writable = false;
 }
 
 Variable.prototype.setValue = function(value) {
-	if(this.inRange(value)) {
-		this.value = value;
-	}
+  if(this.inRange(value)) {
+    this.value = value;
+  }
 }
 
 Variable.prototype.inRange = function(value) {
-	if(value >= this.minimum && value <= this.maximum) {
-		return true;
-	} else {
-		return false;
-	}
+  if(value >= this.minimum && value <= this.maximum) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 Variable.prototype.setRange = function(minimum, maximum) {
-	this.minimum = minimum;
-	this.maximum = maximum;
+  this.minimum = minimum;
+  this.maximum = maximum;
 }
 
 Variable.prototype.getValue = function() {
-	return this.value;
+  return this.value;
 }
 
 Variable.prototype.getName = function() {
-	return this.name;
+  return this.name;
 }
 
 Variable.prototype.setPin = function(pin) {
-	this.pin = pin;
+  this.pin = pin;
 }
 
 Variable.prototype.getPin = function() {
-	return this.pin;
+  return this.pin;
 }
 
 Variable.prototype.setReadable = function(readable) {
-	this.readable = readable;
+  this.readable = readable;
 }
 
 Variable.prototype.setWritable = function(writable) {
-	this.writable = writable;
+  this.writable = writable;
 }
 
 Variable.prototype.isReadable = function() {
-	return this.readable;
+  return this.readable;
 }
 
 Variable.prototype.isWritable = function() {
-	return this.writable;
+  return this.writable;
 }
 
 module.exports = Variable;

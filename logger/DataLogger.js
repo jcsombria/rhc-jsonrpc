@@ -43,7 +43,18 @@ Data.prototype.toString = function() {
   }
   var first = true, sep = ' ';
   for(var field in this.fields) {
-    message += sep + field + '=' + this.fields[field];
+    var value = this.fields[field];
+    if(Array.isArray(value)) {
+      for(var i=0; i<value.length; i++) {
+        if(i > 0) {
+          message += ',' + field + i + '=' + value[i];
+        } else {
+          message += ' ' + field + i + '=' + value[i];
+        }
+      }
+    } else {
+      message += sep + field + '=' + value; 
+    }
     if(first) {
       first = false;
       sep = ',';
@@ -60,6 +71,16 @@ function DataLogger() {
 
   this.tags = {'session': 1, 'period': 100};
   this.measurement = 'levitador';
+  this.options = {
+    host: 'unedlabs.dia.uned.es',
+    port: '8086',
+    path: '/write?db=levitador&precision=ms',
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic ' + 'levitador:levitador'.toString('base64'),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
+  };
 
   this.log = function(fields) {
     var timestamp = fields.timestamp;
@@ -79,19 +100,11 @@ function DataLogger() {
       message += point.toString();
       point = this.data.shift();
     }
-    var options = {
-      host: '10.195.2.208',
-      port: '8086',
-      path: '/write?db=mydb&precision=ms',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(message)
-      }
-    };
 
     // Send points to data server
-    var req = http.request(options);
+    console.log(message);
+    this.options.headers['Content-Length'] = Buffer.byteLength(message);
+    var req = http.request(this.options);
     req.write(message);
     req.end();
   };

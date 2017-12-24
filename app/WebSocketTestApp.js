@@ -19,20 +19,24 @@
 
 
 var conf = {
-	server: {
-		rip: 'DummyServer',
-		transport: 'WebSocketServer',
-	},
-	board: {
-		require: 'Boards',
-		name: 'TestBoard',
-		variables: [
-			{ 'name': 'ball_height', 'pin': 'P1', 'type': 'in' },
-			{ 'name': 'fan_control', 'pin': 'P2', 'type': 'out' },
-			{ 'name': 'servo_control', 'pin': 'P3', 'type': 'out' },
-			{ 'name': 'setpoint', 'type': 'in_out' },
-		],
-	},
+  server: {
+    rip: 'DummyServer',
+    transport: 'WebSocketServer',
+    info: {
+      name: 'RIP Test - Websockets Server',
+      description: 'A minimal implementation of the RIP protocol, to be used for tests and as example.',
+    },
+  },
+  board: {
+    require: 'Boards',
+    name: 'TestBoard',
+    variables: [
+      { 'name': 'ball_height', 'pin': 'P1', 'type': 'in' },
+      { 'name': 'fan_control', 'pin': 'P2', 'type': 'out' },
+      { 'name': 'servo_control', 'pin': 'P3', 'type': 'out' },
+      { 'name': 'setpoint', 'type': 'in_out' },
+    ],
+  },
 }
 
 var App = require('./GenericApp');

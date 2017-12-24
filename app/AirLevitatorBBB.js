@@ -18,23 +18,27 @@
  */
 
 var conf = {
-	server: {
-		rip: 'HILRemoteServer',
-		transport: 'HttpServer',
-	},
-	board: {
-		require: 'BeagleBoneBlackBoard',
-		name: 'BeagleBoneBlack',
-		variables: [
-			{ 'name': 'ball_height', 'pin': 'P9_36', 'type': 'in' },
-			{ 'name': 'fan_control', 'pin': 'P9_14', 'type': 'out' },
-			{ 'name': 'servo_control', 'pin': 'P9_22', 'type': 'out' },
-			{ 'name': 'setpoint', 'type': 'in_out' },
-			{ 'name': 'kp', 'type': 'in_out' },
-			{ 'name': 'ki', 'type': 'in_out' },
-			{ 'name': 'kd', 'type': 'in_out' },
-		],
-	},
+  server: {
+    rip: 'HILRemoteServer',
+    transport: 'HttpServer',
+    info: {
+      name: 'Air Levitator System',
+      description: 'Air Levitator System Lab - BeagleBone Black',
+    },
+  },
+  board: {
+    require: 'BeagleBoneBlackBoard',
+    name: 'BeagleBoneBlack',
+    variables: [
+      { 'name': 'ball_height', 'pin': 'P9_36', 'type': 'in' },
+      { 'name': 'fan_control', 'pin': 'P9_14', 'type': 'out' },
+      { 'name': 'servo_control', 'pin': 'P9_22', 'type': 'out' },
+      { 'name': 'setpoint', 'type': 'in_out' },
+      { 'name': 'kp', 'type': 'in_out' },
+      { 'name': 'ki', 'type': 'in_out' },
+      { 'name': 'kd', 'type': 'in_out' },
+    ],
+  },
 }
 
 var App = require('./GenericApp');

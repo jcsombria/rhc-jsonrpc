@@ -21,7 +21,9 @@
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
 var DummyServer = new JsonRpcServer();
 
-DummyServer.init = function() {
+DummyServer.init = function(info) {
+  this.info = info;
+
   this.on('connect', { 
     'purpose': 'To establish a connection with the lab.',
     'params': {},
@@ -43,10 +45,10 @@ DummyServer.init = function() {
       'variables': '[string]',
     },
   }, DummyServer.get.bind(this));
-	this.on('disconnect', {
+  this.on('disconnect', {
     'purpose': 'To finish the connection with the lab.',
     'params': {},
-	}, DummyServer.disconnect.bind(this));
+  }, DummyServer.disconnect.bind(this));
 }
 
 DummyServer.setHardwareInterface = function(hardwareInterface) {
@@ -54,9 +56,9 @@ DummyServer.setHardwareInterface = function(hardwareInterface) {
 }
 
 DummyServer.connect = function() {
-	return {
-	  'session-id': UUID(),
-	};
+  return {
+    'session-id': UUID(),
+  };
 };
 
 function UUID() {
@@ -71,38 +73,35 @@ function UUID() {
 
 DummyServer.info = function() {
   return {
-    info: {
-  	  name: 'RIP Test Server',
-  	  description: 'A minimal implementation of the RIP protocol, to be used for tests and as example.',
-	  },
+    info: this.info,
     methods: this.getMethods(),
     readable: this.hardwareInterface.getReadableVariables(),
-		writable: this.hardwareInterface.getWritableVariables(),
-	};
+    writable: this.hardwareInterface.getWritableVariables(),
+  };
 }
 
 DummyServer.get = function(variables) {
-	var result = [];
-	for (i=0; i<variables.length; i++) {
-	  result[i] = this.hardwareInterface.read(variables[i]);
-	}
-	return result;
+  var result = [];
+  for (i=0; i<variables.length; i++) {
+    result[i] = this.hardwareInterface.read(variables[i]);
+  }
+  return result;
 }
 
 DummyServer.set = function(variables, values) {
-	var result = [];
-	for (i=0; i<variables.length; i++) {
-	  var variable = variables[i];
-	  var value = values[i];
-	  this.hardwareInterface.write(variable, value);
-	}
-	return result;
+  var result = [];
+  for (i=0; i<variables.length; i++) {
+    var variable = variables[i];
+    var value = values[i];
+    this.hardwareInterface.write(variable, value);
+  }
+  return result;
 }
 
 DummyServer.disconnect = function() {
-	return {
-		disconnect:'not implemented',
-	};
+  return {
+    disconnect:'not implemented',
+  };
 }
 
 DummyServer.init();

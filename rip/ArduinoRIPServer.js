@@ -24,7 +24,9 @@ var fs = require('fs');
 var JsonRpcServer = require('../jsonrpc/JsonRpcServer');
 var ArduinoRIPServer = new JsonRpcServer();
 
-ArduinoRIPServer.init = function() {
+ArduinoRIPServer.init = function(info) {
+	this.setInfo(info);
+
 	this.on('connect', { 
 		'purpose': 'To establish a connection with the lab.',
 		'params': {},
@@ -62,21 +64,19 @@ ArduinoRIPServer.setHardwareInterface = function(hardwareInterface) {
   this.hardwareInterface = hardwareInterface;
 }
 
+ArduinoRIPServer.setInfo = function(info) {
+	this.info = {
+		name: 'RIP Server',
+		description: 'RIP Server implementation in Node.js',
+	},
+	this.info = info;
+}
+
 ArduinoRIPServer.connect = function() {
 	return { 'session-id': 'AirLevitator'};
 }
 
 ArduinoRIPServer.info = function() {
-	console.log({
-		info: {
-			name: 'Air Levitator System Lab',
-	  		description: 'Air Levitator System Lab',
-		},
-		methods: this.getMethods(),
-  	readable: this.hardwareInterface.getReadableVariables(),
-		writable: this.hardwareInterface.getWritableVariables(),
-	});
-
 	return {
 		info: {
 			name: 'Air Levitator System Lab',
@@ -87,7 +87,7 @@ ArduinoRIPServer.info = function() {
 		writable: this.hardwareInterface.getWritableVariables(),
 	};
 }
-	
+
 ArduinoRIPServer.get = function(variables) {
 	result = [];
 	for (var i=0; i<variables.length; i++) {

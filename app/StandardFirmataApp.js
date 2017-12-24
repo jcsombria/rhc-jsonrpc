@@ -18,44 +18,44 @@
  */
 
 var conf = {
-	server: {
-		rip: 'SFArduinoRIPServer',
-		transport: 'HttpServer',
-	},
-	board: {
-		require: 'SFArduino',
-		name: 'StandardFirmataArduino',
-		variables: [
-			{ 'name': 'A0', 'pin': 'A0', 'type': 'in' },
-			{ 'name': 'A1', 'pin': 'A1', 'type': 'in' },
-			{ 'name': 'A2', 'pin': 'A2', 'type': 'in' },
- 			{ 'name': 'A3', 'pin': 'A3', 'type': 'in' },
-			{ 'name': 'A4', 'pin': 'A4', 'type': 'in' },
-			{ 'name': 'A5', 'pin': 'A5', 'type': 'in' },
-			{ 'name': 'D0', 'pin': 'D0', 'type': 'out' },
-			{ 'name': 'D1', 'pin': 'D1', 'type': 'out' },
-			{ 'name': 'D2', 'pin': 'D2', 'type': 'out' },
-			{ 'name': 'D3', 'pin': 'D3', 'type': 'out' },
-			{ 'name': 'D4', 'pin': 'D4', 'type': 'out' },
-			{ 'name': 'D5', 'pin': 'D5', 'type': 'out' },
-			{ 'name': 'D6', 'pin': 'D6', 'type': 'out' },
-			{ 'name': 'D7', 'pin': 'D7', 'type': 'out' },
-			{ 'name': 'D8', 'pin': 'D8', 'type': 'out' },
-			{ 'name': 'D9', 'pin': 'D9', 'type': 'out' },
-			{ 'name': 'D10', 'pin': 'D10', 'type': 'out' },
-			{ 'name': 'D11', 'pin': 'D11', 'type': 'out' },
-			{ 'name': 'D12', 'pin': 'D12', 'type': 'out' },
-			{ 'name': 'D13', 'pin': 'D13', 'type': 'out' },
-		],
-	},
+  server: {
+    rip: 'SFArduinoRIPServer',
+    transport: 'HttpServer',
+  },
+  board: {
+    require: 'SFArduino',
+    name: 'StandardFirmataArduino',
+    variables: [
+      { 'name': 'A0', 'pin': 'A0', 'type': 'in' },
+      { 'name': 'A1', 'pin': 'A1', 'type': 'in' },
+      { 'name': 'A2', 'pin': 'A2', 'type': 'in' },
+      { 'name': 'A3', 'pin': 'A3', 'type': 'in' },
+      { 'name': 'A4', 'pin': 'A4', 'type': 'in' },
+      { 'name': 'A5', 'pin': 'A5', 'type': 'in' },
+      { 'name': 'D0', 'pin': 'D0', 'type': 'out' },
+      { 'name': 'D1', 'pin': 'D1', 'type': 'out' },
+      { 'name': 'D2', 'pin': 'D2', 'type': 'out' },
+      { 'name': 'D3', 'pin': 'D3', 'type': 'out' },
+      { 'name': 'D4', 'pin': 'D4', 'type': 'out' },
+      { 'name': 'D5', 'pin': 'D5', 'type': 'out' },
+      { 'name': 'D6', 'pin': 'D6', 'type': 'out' },
+      { 'name': 'D7', 'pin': 'D7', 'type': 'out' },
+      { 'name': 'D8', 'pin': 'D8', 'type': 'out' },
+      { 'name': 'D9', 'pin': 'D9', 'type': 'out' },
+      { 'name': 'D10', 'pin': 'D10', 'type': 'out' },
+      { 'name': 'D11', 'pin': 'D11', 'type': 'out' },
+      { 'name': 'D12', 'pin': 'D12', 'type': 'out' },
+      { 'name': 'D13', 'pin': 'D13', 'type': 'out' },
+    ],
+  },
 }
 
 var App = require('./GenericApp');
 App.init(conf);
 App.start = function() {
-		this.boardInterface.connect(function onConnect() {
-      this._start();
-		}.bind(this));
+  this.boardInterface.connect(function onConnect() {
+    this._start();
+  }.bind(this));
 }
 
 App.start();

@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//var server = require('http').createServer();
-//var io = require('socket.io')(server);
 var io = require('socket.io')();
  
 function WebSocketTransport() {
